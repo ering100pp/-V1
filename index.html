@@ -44,6 +44,7 @@ input,select,textarea{width:100%;box-sizing:border-box;padding:10px;border:1px s
 .fm .pos,.ff .pos{font-size:8px;padding:0 2px}
 .ff button{display:block;width:100%;padding:0;border:0;background:none;color:var(--fg);font:inherit}
 .ff button.set .sq{outline:2px solid var(--ac)}
+@media(min-width:600px){.bo{max-width:none;gap:8px}.bo .nm,.fm .nm,.ff .nm{font-size:12px}.bo .pos,.fm .pos,.ff .pos{font-size:10px;padding:0 4px}.slot .sq{font-size:24px}.fm,.ff{gap:8px}}
 .ck{display:flex;align-items:center;margin:0}
 .ck input{width:22px;height:22px;padding:0}
 select.gr{width:100%;margin-top:4px;padding:6px 2px;border:0;border-radius:8px;background:var(--sub);color:var(--ac);font-weight:700;font-size:12px;text-align:center;text-align-last:center}
@@ -248,7 +249,7 @@ function setRecords(v){
 }
 async function loadRecords(){try{setRecords(await api("GET","/records"))}catch(e){return false}return true}
 let csBase="";
-const VER="v8";
+const VER="v9";
 const drawCS=()=>{const n=Q.get().length;$("#cs").textContent=csBase+" ["+VER+"]"+(n?(csBase?" / ":"")+`未送信${n}件`:"")};
 const setCS=t=>{csBase=t;drawCS()};
 async function flushQ(){
