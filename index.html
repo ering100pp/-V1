@@ -238,7 +238,7 @@ function setRecords(v){
 }
 async function loadRecords(){try{setRecords(await api("GET","/records"))}catch(e){return false}return true}
 let csBase="";
-const VER="v4";
+const VER="v6";
 const drawCS=()=>{const n=Q.get().length;$("#cs").textContent=csBase+" ["+VER+"]"+(n?(csBase?" / ":"")+`未送信${n}件`:"")};
 const setCS=t=>{csBase=t;drawCS()};
 async function flushQ(){
@@ -598,11 +598,12 @@ $("#ib").onclick=async()=>{
   syncAll();
 };
 /* 画像からのアイコン登録: 画像全体をゲーム内アイコンの外接矩形とみなし、スクショの枠と同じ割合の中央部分で特徴量を作る */
-const IW=0.76,IH=0.79;
+/* 画像から枠に相当する窓を切り出す(実測で求めた値)。窓の幅=画像幅×IW、高さ=幅×5/6(枠は72:60)、中心=画像の(IX,IY)。はみ出し分は背景色で補う。IPは余白 */
+const IW=1.03,IX=0.48,IY=0.59,IP=0.3;
 async function iconData(f){
-  const b=await createImageBitmap(f),c=document.createElement("canvas");c.width=b.width;c.height=b.height;
-  const x=c.getContext("2d",{willReadFrequently:true});x.fillStyle="#eaf3fa";x.fillRect(0,0,c.width,c.height);x.drawImage(b,0,0);
-  return{im:x.getImageData(0,0,b.width,b.height),cv:c};
+  const b=await createImageBitmap(f),px=Math.round(b.width*IP),py=Math.round(b.height*IP),c=document.createElement("canvas");c.width=b.width+2*px;c.height=b.height+2*py;
+  const x=c.getContext("2d",{willReadFrequently:true});x.fillStyle="#eaf3fa";x.fillRect(0,0,c.width,c.height);x.drawImage(b,px,py);
+  return{im:x.getImageData(0,0,c.width,c.height),cv:c,ox:px,oy:py,w:b.width,h:b.height};
 }
 let IR=[];
 function drawIR(){
@@ -614,8 +615,8 @@ $("#ifl").onchange=async()=>{
   const k=$("#ikd").value;$("#ims").textContent="読み込み中…";let bad=0;
   for(const f of fs){
     try{
-      const{im,cv}=await iconData(f);
-      const bx={x:Math.round(im.width*(1-IW)/2),y:Math.round(im.height*(1-IH)/2),w:Math.round(im.width*IW),h:Math.round(im.height*IH)};
+      const{im,cv,ox,oy,w,h}=await iconData(f);
+      const bw=Math.round(w*IW),bh=Math.round(bw*5/6),bx={x:Math.round(ox+w*IX-bw/2),y:Math.round(oy+h*IY-bh/2),w:bw,h:bh};
       const t=document.createElement("canvas");t.width=72;t.height=60;t.getContext("2d").drawImage(cv,bx.x,bx.y,bx.w,bx.h,0,0,72,60);
       IR.push({n:decodeName(f.name.replace(/\.[^.]+$/,"").trim()),k,d:b64(feat(im,bx)),th:t.toDataURL("image/jpeg",.82)});
     }catch(e){bad++}
