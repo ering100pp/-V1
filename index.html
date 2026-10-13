@@ -73,6 +73,7 @@ select+input{margin-top:6px}
 .ir img{width:54px;height:45px;border-radius:6px;background:var(--sub);display:block}
 .ir input{padding:6px;font-size:14px}
 .dr{display:grid;grid-template-columns:54px 1fr;gap:8px;align-items:start;margin-top:8px;padding-bottom:8px;border-bottom:1px solid var(--bd)}
+.dr img.tm{width:54px;height:45px;border-radius:6px;background:var(--sub);display:block;margin-top:2px;object-fit:cover}
 .dr canvas{width:54px;height:45px;border-radius:6px;background:var(--sub);display:block;margin-top:2px}
 .dr input{padding:6px;font-size:14px}
 .dr .rw{display:flex;gap:6px;margin-top:6px;align-items:center}
@@ -264,6 +265,7 @@ async function syncAll(){
 }
 
 /* アイコン照合の共通処理(特徴量: 各枠を16x16に区切ったRGB平均 = 768バイト) */
+const SH=[[0,0],[-2,0],[2,0],[0,-2],[0,2]];
 const REF=1080,SX=[321,446,571,697,822,947,1383,1508,1633,1758,1884,2010],CY=866,CW=72,CHH=60,FN=16;
 function slotBox(W,H,i){const k=H/REF;return{x:Math.round(W/2+(SX[i]-1170)*k-CW*k/2),y:Math.round(CY*k-CHH*k/2),w:Math.round(CW*k),h:Math.round(CHH*k)}}
 function feat(im,b){
@@ -290,7 +292,7 @@ let TPL=[];
 const unb64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
 function rebuild(list){
   const t=[];
-  for(const x of list||[]){try{if(!x||!x.n||!x.d)continue;const f=unb64(x.d);if(f.length!==FN*FN*3)continue;t.push({n:x.n,base:x.n.replace(/#\d+$/,""),z:norm(f),k:x.k,f,d:x.d})}catch(e){}}
+  for(const x of list||[]){try{if(!x||!x.n||!x.d)continue;const f=unb64(x.d);if(f.length!==FN*FN*3)continue;t.push({th:x.th||LS.get("bat-th",{})[x.n]||"",n:x.n,base:x.n.replace(/#\d+$/,""),z:norm(f),k:x.k,f,d:x.d})}catch(e){}}
   TPL=t;
 }
 
@@ -385,7 +387,7 @@ function startEdit(id){
 async function imgData(f){const b=await createImageBitmap(f),c=document.createElement("canvas");c.width=b.width;c.height=b.height;const x=c.getContext("2d",{willReadFrequently:true});x.drawImage(b,0,0);return x.getImageData(0,0,b.width,b.height)}
 function matchAll(im){
   const th=S.th;
-  return SX.map((_,i)=>{const b=slotBox(im.width,im.height,i),z=norm(feat(im,b));const bm={};for(const t of TPL){const s=sim(z,t.z);if(!(t.base in bm)||s>bm[t.base])bm[t.base]=s}const sc=Object.entries(bm).map(([n,s])=>({n,s})).sort((a,b)=>b.s-a.s),t1=sc[0]||{n:"",s:-1},t2=sc[1];return{n:t1.s>=th?t1.n:"",s:t1.s,b:t1.n,c:sc.slice(0,3).map(x=>x.n),m:t2?t1.s-t2.s:1}});
+  return SX.map((_,i)=>{const b=slotBox(im.width,im.height,i),zs=SH.map(([dx,dy])=>norm(feat(im,{...b,x:b.x+dx,y:b.y+dy})));const bm={};for(const t of TPL){let s=-1;for(const z of zs){const v=sim(z,t.z);if(v>s)s=v}if(!(t.base in bm)||s>bm[t.base])bm[t.base]=s}const sc=Object.entries(bm).map(([n,s])=>({n,s})).sort((a,b)=>b.s-a.s),t1=sc[0]||{n:"",s:-1},t2=sc[1];return{n:t1.s>=th?t1.n:"",s:t1.s,b:t1.n,c:sc.slice(0,3).map(x=>x.n),m:t2?t1.s-t2.s:1}});
 }
 async function recog(){
   const f=$("#shot").files[0],st=$("#rst");if(!f)return;
@@ -559,6 +561,8 @@ $("#lsb").onclick=async()=>{
   $("#lsm").textContent="保存しました";syncAll();
 };
 const sampleName=(n,ex)=>{const u=new Set([...TPL.map(t=>t.n),...ex.map(j=>j.n)]);if(!u.has(n))return n;let i=2;while(u.has(`${n}#${i}`))i++;return `${n}#${i}`};
+const thumbOf=(cv,b)=>{const t=document.createElement("canvas");t.width=72;t.height=60;t.getContext("2d").drawImage(cv,b.x,b.y,b.w,b.h,0,0,72,60);return t.toDataURL("image/jpeg",.82)};
+const keepTh=(n,th)=>{if(!th)return;const m=LS.get("bat-th",{});m[n]=th;LS.set("bat-th",m)};
 const b64=u=>btoa(String.fromCharCode(...u));
 let AD=null;
 $("#ish").onchange=async()=>{
@@ -566,7 +570,7 @@ $("#ish").onchange=async()=>{
   try{
     const im=await imgData(f),m=TPL.length?matchAll(im):SX.map(()=>({n:""}));
     const big=document.createElement("canvas");big.width=im.width;big.height=im.height;big.getContext("2d").putImageData(im,0,0);
-    AD={fs:SX.map((_,i)=>feat(im,slotBox(im.width,im.height,i)))};
+    AD={fs:SX.map((_,i)=>feat(im,slotBox(im.width,im.height,i))),th:SX.map((_,i)=>thumbOf(big,slotBox(im.width,im.height,i)))};
     let h="";
     SX.forEach((_,i)=>{
       if(i===0||i===6)h+=`<div class="lb">${i?"相手の防衛":"自分の攻撃"}</div>`;
@@ -581,11 +585,11 @@ $("#ish").onchange=async()=>{
 $("#ib").onclick=async()=>{
   if(!AD)return;
   const jobs=[];
-  SX.forEach((_,i)=>{const n=$(`[data-n="${i}"]`).value.trim();if(n)jobs.push({n:sampleName(n,jobs),k:(i%6)<4?"st":"sp",d:b64(AD.fs[i])})});
+  SX.forEach((_,i)=>{const n=$(`[data-n="${i}"]`).value.trim();if(n)jobs.push({n:sampleName(n,jobs),k:(i%6)<4?"st":"sp",d:b64(AD.fs[i]),th:AD.th[i]})});
   if(!jobs.length){$("#im").textContent="名前を入れた枠がありません";return}
   const btn=$("#ib");btn.disabled=true;$("#im").textContent="登録中…";
   let ok=0,err="";
-  for(const j of jobs){try{await api("POST","/icons",j);ok++}catch(e){err=e&&e.message||"";break}}
+  for(const j of jobs){try{await api("POST","/icons",j);keepTh(j.n,j.th);ok++}catch(e){err=e&&e.message||"";break}}
   btn.disabled=false;
   $("#im").textContent=err?`${ok}件登録後に失敗しました: ${err}`:`${ok}件登録しました`;
   if(!err){AD=null;$("#ig").innerHTML="";btn.hidden=true}
@@ -611,7 +615,7 @@ $("#ifl").onchange=async()=>{
       const{im,cv}=await iconData(f);
       const bx={x:Math.round(im.width*(1-IW)/2),y:Math.round(im.height*(1-IH)/2),w:Math.round(im.width*IW),h:Math.round(im.height*IH)};
       const t=document.createElement("canvas");t.width=72;t.height=60;t.getContext("2d").drawImage(cv,bx.x,bx.y,bx.w,bx.h,0,0,72,60);
-      IR.push({n:f.name.replace(/\.[^.]+$/,"").trim(),k,d:b64(feat(im,bx)),th:t.toDataURL()});
+      IR.push({n:f.name.replace(/\.[^.]+$/,"").trim(),k,d:b64(feat(im,bx)),th:t.toDataURL("image/jpeg",.82)});
     }catch(e){bad++}
   }
   $("#ifl").value="";drawIR();
@@ -620,12 +624,12 @@ $("#ifl").onchange=async()=>{
 $("#irw").oninput=e=>{const t=e.target.closest("[data-in]");if(t)IR[+t.dataset.in].n=t.value};
 $("#irw").onclick=e=>{const b=e.target.closest("[data-ix]");if(b){IR.splice(+b.dataset.ix,1);drawIR()}};
 $("#igo").onclick=async()=>{
-  const jobs=IR.map(r=>({n:r.n.trim(),k:r.k,d:r.d}));
+  const jobs=IR.map(r=>({n:r.n.trim(),k:r.k,d:r.d,th:r.th}));
   if(jobs.some(j=>!j.n)){$("#ims").textContent="名前が空の行があります";return}
   const ow=jobs.filter(j=>TPL.some(t=>t.n===j.n)).length;
   if(ow&&!confirm(`${ow}件は登録済みの名前です。上書きしますか?`))return;
   const btn=$("#igo");btn.disabled=true;let done=0,err="",i=0;
-  const run=async()=>{while(i<jobs.length&&!err){const j=jobs[i++];try{await api("POST","/icons",j);done++}catch(e){err=e&&e.message||"error"}$("#ims").textContent=`登録中 ${done}/${jobs.length}`}};
+  const run=async()=>{while(i<jobs.length&&!err){const j=jobs[i++];try{await api("POST","/icons",j);keepTh(j.n,j.th);done++}catch(e){err=e&&e.message||"error"}$("#ims").textContent=`登録中 ${done}/${jobs.length}`}};
   await Promise.all([run(),run(),run(),run()]);
   btn.disabled=false;
   $("#ims").textContent=err?`${done}件登録後に失敗しました: ${err}`:`${done}件登録しました`;
@@ -636,8 +640,8 @@ function drawDL(){
   const q=($("#dq").value||"").trim().toLowerCase();
   const l=TPL.slice().sort((a,b)=>(a.k||"z").localeCompare(b.k||"z")||a.n.localeCompare(b.n,"ja")).filter(t=>!q||t.n.toLowerCase().includes(q));
   $("#dh").textContent=`登録済みアイコン(${TPL.length}件${q?`・表示${l.length}件`:""})`;
-  $("#dl").innerHTML=l.map((t,i)=>`<div class="dr" data-o="${esc(t.n)}"><canvas width="16" height="16" data-ci="${i}"></canvas><div><input class="dn" value="${esc(t.n)}" aria-label="生徒名"><div class="rw"><select class="dk" aria-label="ロール">${["st","sp",""].map(v=>`<option value="${v}"${(t.k||"")===v?" selected":""}>${v==="st"?"ST":v==="sp"?"SP":"未設定"}</option>`).join("")}</select><button class="del" data-sv>保存</button><button class="del" data-dx>削除</button></div></div></div>`).join("");
-  l.forEach((t,i)=>{const x=$(`[data-ci="${i}"]`).getContext("2d"),id=x.createImageData(16,16);for(let p=0;p<256;p++){id.data[p*4]=t.f[p*3];id.data[p*4+1]=t.f[p*3+1];id.data[p*4+2]=t.f[p*3+2];id.data[p*4+3]=255}x.putImageData(id,0,0)});
+  $("#dl").innerHTML=l.map((t,i)=>`<div class="dr" data-o="${esc(t.n)}">${t.th?`<img class="tm" src="${esc(t.th)}" alt="">`:`<canvas width="16" height="16" data-ci="${i}"></canvas>`}<div><input class="dn" value="${esc(t.n)}" aria-label="生徒名"><div class="rw"><select class="dk" aria-label="ロール">${["st","sp",""].map(v=>`<option value="${v}"${(t.k||"")===v?" selected":""}>${v==="st"?"ST":v==="sp"?"SP":"未設定"}</option>`).join("")}</select><button class="del" data-sv>保存</button><button class="del" data-dx>削除</button></div></div></div>`).join("");
+  l.forEach((t,i)=>{const cv=$(`[data-ci="${i}"]`);if(!cv)return;const x=cv.getContext("2d"),id=x.createImageData(16,16);for(let p=0;p<256;p++){id.data[p*4]=t.f[p*3];id.data[p*4+1]=t.f[p*3+1];id.data[p*4+2]=t.f[p*3+2];id.data[p*4+3]=255}x.putImageData(id,0,0)});
   $("#dm").textContent=TPL.length?(l.length?"":"該当なし"):"まだ登録がありません";
 }
 $("#dq").oninput=drawDL;
@@ -654,7 +658,7 @@ $("#dl").onclick=async e=>{
     if(!n){alert("名前が空です");return}
     if(n===o&&(t.k||null)===k)return;
     if(n!==o&&TPL.some(x=>x.n===n)&&!confirm(`「${n}」はすでに登録済みです。そのアイコンを上書きしますか?`))return;
-    try{await api("POST","/icons",{n,k,d:t.d});if(n!==o)await api("DELETE","/icons/"+encodeURIComponent(o))}catch(err){alert("保存に失敗しました: "+(err&&err.message||""));return}
+    try{await api("POST","/icons",{n,k,d:t.d,th:t.th||undefined});if(n!==o)await api("DELETE","/icons/"+encodeURIComponent(o));keepTh(n,t.th)}catch(err){alert("保存に失敗しました: "+(err&&err.message||""));return}
     syncAll();
   }
 };
