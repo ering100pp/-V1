@@ -238,7 +238,7 @@ function setRecords(v){
 }
 async function loadRecords(){try{setRecords(await api("GET","/records"))}catch(e){return false}return true}
 let csBase="";
-const VER="v6";
+const VER="v7";
 const drawCS=()=>{const n=Q.get().length;$("#cs").textContent=csBase+" ["+VER+"]"+(n?(csBase?" / ":"")+`未送信${n}件`:"")};
 const setCS=t=>{csBase=t;drawCS()};
 async function flushQ(){
@@ -513,9 +513,9 @@ $("#ct").onclick=()=>{S.cont=!S.cont;saveLocal();drawForm()};
 $("#mq").onclick=()=>{const k=[...MISS][0];if(k){chain=true;openSheet(k[0],+k[1])}};
 $("#ebx").onclick=()=>{editId=null;F=fresh();MISS=new Set();drawForm()};
 $("#sq").oninput=drawSheet;
-$("#sq").onkeydown=e=>{if(e.key==="Enter"){const b=$("#sl [data-p]"),x=$("#sq").value.trim();if(b)pick(b.dataset.p);else if(x)pick(x)}};
+$("#sq").onkeydown=e=>{if(e.key==="Enter"){const b=$("#sl [data-p]"),x=hw($("#sq").value);if(b)pick(b.dataset.p);else if(x)pick(x)}};
 $("#sl").onclick=e=>{const b=e.target.closest("[data-p]");if(b)pick(b.dataset.p)};
-$("#sok").onclick=()=>{const x=$("#sq").value.trim();if(x)pick(x)};
+$("#sok").onclick=()=>{const x=hw($("#sq").value);if(x)pick(x)};
 $("#sem").onclick=()=>pick("");
 $("#shx").onclick=()=>{chain=false;$("#sh").hidden=true};
 $("#hse").onchange=e=>{H.se=e.target.value;H.lim=30;renderHist()};
@@ -557,10 +557,12 @@ function fillAdm(){
   drawDL();
 }
 $("#lsb").onclick=async()=>{
-  const f=t=>[...new Set($(t).value.split("\n").map(s=>s.trim()).filter(Boolean))];
+  const f=t=>[...new Set($(t).value.split("\n").map(hw).filter(Boolean))];
   try{await api("PUT","/config",{students:{st:f("#lst"),sp:f("#lsp")},th:parseFloat($("#lth").value)||undefined,players:S.cpl})}catch(e){$("#lsm").textContent="保存に失敗しました: "+(e&&e.message||"");return}
   $("#lsm").textContent="保存しました";syncAll();
 };
+/* 全角の英数記号(かっこ含む)と全角スペースを半角にする。かな・漢字・長音は変えない */
+const hw=n=>String(n??"").replace(/[\uFF01-\uFF5E]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0)).replace(/\u3000/g," ").trim();
 const decodeName=n=>{if(!/^[0-9A-Fa-f_]{12,}$/.test(n))return n;try{const h=n.replace(/_/g,"");if(h.length%2)return n;const b=Uint8Array.from(h.match(/../g),x=>parseInt(x,16));const t=new TextDecoder("utf-8",{fatal:true}).decode(b).replace(/\.[^.]+$/,"").replace(/^img_?/i,"").replace(/_?icon$/i,"");return t||n}catch(e){return n}};
 const sampleName=(n,ex)=>{const u=new Set([...TPL.map(t=>t.n),...ex.map(j=>j.n)]);if(!u.has(n))return n;let i=2;while(u.has(`${n}#${i}`))i++;return `${n}#${i}`};
 const thumbOf=(cv,b)=>{const t=document.createElement("canvas");t.width=72;t.height=60;t.getContext("2d").drawImage(cv,b.x,b.y,b.w,b.h,0,0,72,60);return t.toDataURL("image/jpeg",.82)};
@@ -587,7 +589,7 @@ $("#ish").onchange=async()=>{
 $("#ib").onclick=async()=>{
   if(!AD)return;
   const jobs=[];
-  SX.forEach((_,i)=>{const n=$(`[data-n="${i}"]`).value.trim();if(n)jobs.push({n:sampleName(n,jobs),k:(i%6)<4?"st":"sp",d:b64(AD.fs[i]),th:AD.th[i]})});
+  SX.forEach((_,i)=>{const n=hw($(`[data-n="${i}"]`).value);if(n)jobs.push({n:sampleName(n,jobs),k:(i%6)<4?"st":"sp",d:b64(AD.fs[i]),th:AD.th[i]})});
   if(!jobs.length){$("#im").textContent="名前を入れた枠がありません";return}
   const btn=$("#ib");btn.disabled=true;$("#im").textContent="登録中…";
   let ok=0,err="";
@@ -618,7 +620,7 @@ $("#ifl").onchange=async()=>{
       const{im,cv,ox,oy,w,h}=await iconData(f);
       const bw=Math.round(w*IW),bh=Math.round(bw*5/6),bx={x:Math.round(ox+w*IX-bw/2),y:Math.round(oy+h*IY-bh/2),w:bw,h:bh};
       const t=document.createElement("canvas");t.width=72;t.height=60;t.getContext("2d").drawImage(cv,bx.x,bx.y,bx.w,bx.h,0,0,72,60);
-      IR.push({n:decodeName(f.name.replace(/\.[^.]+$/,"").trim()),k,d:b64(feat(im,bx)),th:t.toDataURL("image/jpeg",.82)});
+      IR.push({n:hw(decodeName(f.name.replace(/\.[^.]+$/,"").trim())),k,d:b64(feat(im,bx)),th:t.toDataURL("image/jpeg",.82)});
     }catch(e){bad++}
   }
   $("#ifl").value="";drawIR();
@@ -627,7 +629,7 @@ $("#ifl").onchange=async()=>{
 $("#irw").oninput=e=>{const t=e.target.closest("[data-in]");if(t)IR[+t.dataset.in].n=t.value};
 $("#irw").onclick=e=>{const b=e.target.closest("[data-ix]");if(b){IR.splice(+b.dataset.ix,1);drawIR()}};
 $("#igo").onclick=async()=>{
-  const jobs=IR.map(r=>({n:r.n.trim(),k:r.k,d:r.d,th:r.th}));
+  const jobs=IR.map(r=>({n:hw(r.n),k:r.k,d:r.d,th:r.th}));
   if(jobs.some(j=>!j.n)){$("#ims").textContent="名前が空の行があります";return}
   const ow=jobs.filter(j=>TPL.some(t=>t.n===j.n)).length;
   if(ow&&!confirm(`${ow}件は登録済みの名前です。上書きしますか?`))return;
@@ -657,7 +659,7 @@ $("#dl").onclick=async e=>{
     syncAll();return;
   }
   if(e.target.closest("[data-sv]")){
-    const n=row.querySelector(".dn").value.trim(),k=row.querySelector(".dk").value||null;
+    const n=hw(row.querySelector(".dn").value),k=row.querySelector(".dk").value||null;
     if(!n){alert("名前が空です");return}
     if(n===o&&(t.k||null)===k)return;
     if(n!==o&&TPL.some(x=>x.n===n)&&!confirm(`「${n}」はすでに登録済みです。そのアイコンを上書きしますか?`))return;
