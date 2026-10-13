@@ -113,6 +113,12 @@ details.at summary{padding:2px 0 0}
 .seg button{padding:10px;border:2px solid var(--bd);border-radius:10px;background:var(--card);color:var(--fg);font-weight:800;font-size:15px}
 .seg button.on{background:var(--ac);border-color:var(--ac);color:#fff}
 .ar{border-top:1px solid var(--bd);margin-top:6px;padding-top:6px}
+  @media(min-width:900px){
+#sh{align-items:center;justify-content:center}
+.sc{width:min(760px,92vw);max-height:82vh;border-radius:16px}
+.plist{display:grid;grid-template-columns:1fr 1fr}
+#nv{padding-left:calc((100% - 720px)/2);padding-right:calc((100% - 720px)/2)}
+}
 </style></head><body>
 <div class="wrap">
 <div class="hd"><h1>戦術対抗戦ログ <span class="sbd" id="sbd"></span></h1><div style="display:flex;gap:6px"><button class="chip" id="rl">再読込</button><button class="chip" id="th">テーマ</button></div></div>
@@ -716,6 +722,7 @@ $("#sl").onclick=e=>{const b=e.target.closest("[data-p]");if(b)pick(b.dataset.p)
 $("#sok").onclick=()=>{const x=hw($("#sq").value);if(x)pick(x)};
 $("#sem").onclick=()=>pick("");
 $("#shx").onclick=()=>{chain=false;HQ=[];$("#sh").hidden=true};
+  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("#sh").hidden){chain=false;HQ=[];$("#sh").hidden=true}});
 $("#sh").onclick=e=>{if(e.target.id==="sh"){chain=false;HQ=[];$("#sh").hidden=true}};
 $("#sun").onclick=()=>{SHOWALL=!SHOWALL;drawSheet()};
 $("#hq").oninput=e=>{H.q=e.target.value;H.lim=30;renderHist()};
