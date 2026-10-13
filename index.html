@@ -238,7 +238,8 @@ function setRecords(v){
 }
 async function loadRecords(){try{setRecords(await api("GET","/records"))}catch(e){return false}return true}
 let csBase="";
-const drawCS=()=>{const n=Q.get().length;$("#cs").textContent=csBase+(n?(csBase?" / ":"")+`未送信${n}件`:"")};
+const VER="v4";
+const drawCS=()=>{const n=Q.get().length;$("#cs").textContent=csBase+" ["+VER+"]"+(n?(csBase?" / ":"")+`未送信${n}件`:"")};
 const setCS=t=>{csBase=t;drawCS()};
 async function flushQ(){
   const q=Q.get();if(!q.length||flushing)return;flushing=true;
@@ -560,6 +561,7 @@ $("#lsb").onclick=async()=>{
   try{await api("PUT","/config",{students:{st:f("#lst"),sp:f("#lsp")},th:parseFloat($("#lth").value)||undefined,players:S.cpl})}catch(e){$("#lsm").textContent="保存に失敗しました: "+(e&&e.message||"");return}
   $("#lsm").textContent="保存しました";syncAll();
 };
+const decodeName=n=>{if(!/^[0-9A-Fa-f_]{12,}$/.test(n))return n;try{const h=n.replace(/_/g,"");if(h.length%2)return n;const b=Uint8Array.from(h.match(/../g),x=>parseInt(x,16));const t=new TextDecoder("utf-8",{fatal:true}).decode(b).replace(/\.[^.]+$/,"").replace(/^img_?/i,"").replace(/_?icon$/i,"");return t||n}catch(e){return n}};
 const sampleName=(n,ex)=>{const u=new Set([...TPL.map(t=>t.n),...ex.map(j=>j.n)]);if(!u.has(n))return n;let i=2;while(u.has(`${n}#${i}`))i++;return `${n}#${i}`};
 const thumbOf=(cv,b)=>{const t=document.createElement("canvas");t.width=72;t.height=60;t.getContext("2d").drawImage(cv,b.x,b.y,b.w,b.h,0,0,72,60);return t.toDataURL("image/jpeg",.82)};
 const keepTh=(n,th)=>{if(!th)return;const m=LS.get("bat-th",{});m[n]=th;LS.set("bat-th",m)};
@@ -615,7 +617,7 @@ $("#ifl").onchange=async()=>{
       const{im,cv}=await iconData(f);
       const bx={x:Math.round(im.width*(1-IW)/2),y:Math.round(im.height*(1-IH)/2),w:Math.round(im.width*IW),h:Math.round(im.height*IH)};
       const t=document.createElement("canvas");t.width=72;t.height=60;t.getContext("2d").drawImage(cv,bx.x,bx.y,bx.w,bx.h,0,0,72,60);
-      IR.push({n:f.name.replace(/\.[^.]+$/,"").trim(),k,d:b64(feat(im,bx)),th:t.toDataURL("image/jpeg",.82)});
+      IR.push({n:decodeName(f.name.replace(/\.[^.]+$/,"").trim()),k,d:b64(feat(im,bx)),th:t.toDataURL("image/jpeg",.82)});
     }catch(e){bad++}
   }
   $("#ifl").value="";drawIR();
