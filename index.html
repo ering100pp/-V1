@@ -125,6 +125,7 @@ details.card summary{cursor:pointer;font-weight:700;font-size:13px}
     <button class="btn" id="ob" style="margin-top:10px">保存</button><p id="om" class="mut"></p>
   </div>
   <div id="adm" hidden>
+    <p id="kinfo" class="mut" style="margin:0 0 8px"></p>
     <div class="card"><h3>生徒リスト(プルダウンの中身)</h3>
       <label for="lst" style="margin-top:0">ST生徒(1行に1名)</label><textarea id="lst" rows="8"></textarea>
       <label for="lsp">SP生徒(1行に1名)</label><textarea id="lsp" rows="8"></textarea>
@@ -192,7 +193,10 @@ async function api(method,path,body){
   const c=new AbortController(),tm=setTimeout(()=>c.abort(),15000);
   try{
     const r=await fetch(API_BASE+path,{method,signal:c.signal,headers:{...(KEY?{"X-Key":KEY}:{}),...(body?{"Content-Type":"application/json"}:{})},body:body?JSON.stringify(body):undefined});
-    if(r.status===401)throw new Error("キーが違います(設定タブで確認)");
+    if(r.status===401){
+      const j=await r.json().catch(()=>null),w=j&&j.reason;
+      throw new Error(w==="no_secret"?"Workerに APP_KEY が設定されていません(Cloudflareで登録して、デプロイしてください)":w==="no_key"?"この端末にキーがありません":w==="mismatch"?"キーがWorkerの APP_KEY と一致しません":"キーが違います(Workerが古い可能性。最新のworker.jsをデプロイしてください)");
+    }
     if(!r.ok)throw new Error("HTTP "+r.status);
     return r.status===204?null:await r.json().catch(()=>null);
   }finally{clearTimeout(tm)}
@@ -486,9 +490,9 @@ $("#hl").onclick=async e=>{
 /* 設定(プレーヤー名の候補のみ) */
 $("#ob").onclick=()=>{
   /* 「admin:キー」の行は管理者キーとして扱い、候補には入れない(「admin:」だけの行で解除) */
-  const ls=$("#oq").value.split("\n").map(s=>s.trim()).filter(Boolean),ki=ls.filter(s=>s.startsWith("admin:"));
+  const ls=$("#oq").value.split("\n").map(s=>s.trim()).filter(Boolean),isK=s=>/^admin[:：]/i.test(s),ki=ls.filter(isK);
   if(ki.length){KEY=ki[ki.length-1].slice(6).trim();try{KEY?localStorage.setItem("bat-key",KEY):localStorage.removeItem("bat-key")}catch(e){}applyMode()}
-  S.players=[...new Set(ls.filter(s=>!s.startsWith("admin:")))];
+  S.players=[...new Set(ls.filter(s=>!isK(s)))];
   $("#oq").value=S.players.join("\n");
   saveLocal();refreshDL();drawForm();$("#om").textContent="保存しました";
 };
@@ -496,6 +500,7 @@ $("#ob").onclick=()=>{
 /* 管理者: 生徒リストとアイコン辞書の編集(キーを入れた端末のみ表示) */
 const applyMode=()=>{$("#adm").hidden=!KEY;if(KEY)fillAdm()};
 function fillAdm(){
+  $("#kinfo").textContent=`この端末に保存中のキー: ${KEY.slice(0,2)}…(${KEY.length}文字)。Workerの APP_KEY と同じか確認してください`;
   $("#lth").value=S.th;
   $("#lst").value=S.st.join("\n");$("#lsp").value=S.sp.join("\n");
   $("#adl").innerHTML=[...new Set([...kindList("st"),...kindList("sp")])].map(x=>`<option value="${esc(x)}">`).join("");
