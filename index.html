@@ -71,6 +71,11 @@ select+input{margin-top:6px}
 .ir{display:grid;grid-template-columns:54px 1fr auto;gap:8px;align-items:center;margin-top:6px}
 .ir img{width:54px;height:45px;border-radius:6px;background:var(--sub);display:block}
 .ir input{padding:6px;font-size:14px}
+.dr{display:grid;grid-template-columns:54px 1fr;gap:8px;align-items:start;margin-top:8px;padding-bottom:8px;border-bottom:1px solid var(--bd)}
+.dr canvas{width:54px;height:45px;border-radius:6px;background:var(--sub);display:block;margin-top:2px}
+.dr input{padding:6px;font-size:14px}
+.dr .rw{display:flex;gap:6px;margin-top:6px;align-items:center}
+.dr select{width:auto;padding:6px}
 details.card summary{cursor:pointer;font-weight:700;font-size:13px}
 .stt{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px}
 .stt td{padding:4px;border-bottom:1px solid var(--bd);vertical-align:top}
@@ -141,13 +146,17 @@ details.card summary{cursor:pointer;font-weight:700;font-size:13px}
       <div id="irw"></div>
       <button class="btn" id="igo" style="margin-top:10px" hidden>登録する</button><p id="ims" class="mut"></p>
     </div>
+    <div class="card"><h3 id="dh">登録済みアイコン</h3>
+      <input id="dq" placeholder="名前で絞り込み" autocomplete="off" aria-label="登録済みアイコンを絞り込み">
+      <div id="dl"></div><p id="dm" class="mut"></p>
+      <p class="mut">サムネイルは照合に使っている粗い画像です。名前やロールを直して「保存」できます(過去の記録の名前は変わりません)。画像を差し替えるときは、同じ名前で再登録してください</p>
+    </div>
     <div class="card"><h3>スクショで認識テスト・登録(予備)</h3>
       <div style="position:relative"><div class="btn out">スクショを選ぶ</div>
       <input type="file" id="ish" accept="image/*" aria-label="アイコン登録用のスクショを選ぶ" style="position:absolute;left:0;top:0;width:100%;height:100%;opacity:0;font-size:16px"></div>
       <p class="mut" style="margin:6px 0 0">バトル履歴のスクショで認識結果を確認できます。薄い文字は認識結果、各枠の下の小さい文字は一番近い候補と類似度です。登録したい枠に生徒名を入力します。名前を入れた枠だけ登録します(同じ名前は上書き)</p>
       <div class="ig" id="ig"></div><datalist id="adl"></datalist>
       <button class="btn" id="ib" style="margin-top:10px" hidden>名前を入れた枠を登録</button><p id="im" class="mut"></p>
-      <details style="margin-top:8px"><summary>登録済みアイコン(タップで削除)</summary><div class="chips" id="il"></div></details>
     </div>
   </div>
   <p class="mut">この候補はこの端末にだけ保存されます。生徒名・育成度の選択肢・アイコン・記録は、サークル共通のサーバーから読み込みます。</p>
@@ -255,7 +264,7 @@ let TPL=[];
 const unb64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
 function rebuild(list){
   const t=[];
-  for(const x of list||[]){try{if(!x||!x.n||!x.d)continue;const f=unb64(x.d);if(f.length!==FN*FN*3)continue;t.push({n:x.n,z:norm(f),k:x.k})}catch(e){}}
+  for(const x of list||[]){try{if(!x||!x.n||!x.d)continue;const f=unb64(x.d);if(f.length!==FN*FN*3)continue;t.push({n:x.n,z:norm(f),k:x.k,f,d:x.d})}catch(e){}}
   TPL=t;
 }
 
@@ -504,7 +513,7 @@ function fillAdm(){
   $("#lth").value=S.th;
   $("#lst").value=S.st.join("\n");$("#lsp").value=S.sp.join("\n");
   $("#adl").innerHTML=[...new Set([...kindList("st"),...kindList("sp")])].map(x=>`<option value="${esc(x)}">`).join("");
-  $("#il").innerHTML=TPL.length?TPL.slice().sort((a,b)=>a.n.localeCompare(b.n,"ja")).map(t=>`<button class="chip" data-di="${esc(t.n)}">${esc(t.n)}${t.k?` <small>${t.k}</small>`:""}</button>`).join(""):`<span class="mut">まだ登録がありません</span>`;
+  drawDL();
 }
 $("#lsb").onclick=async()=>{
   const f=t=>[...new Set($(t).value.split("\n").map(s=>s.trim()).filter(Boolean))];
@@ -586,11 +595,31 @@ $("#igo").onclick=async()=>{
   if(!err){IR=[];drawIR()}
   syncAll();
 };
-$("#il").onclick=async e=>{
-  const b=e.target.closest("[data-di]");if(!b)return;
-  const n=b.dataset.di;if(!confirm(`「${n}」のアイコンを辞書から削除しますか?`))return;
-  try{await api("DELETE","/icons/"+encodeURIComponent(n))}catch(err){alert("削除に失敗しました: "+(err&&err.message||""));return}
-  syncAll();
+function drawDL(){
+  const q=($("#dq").value||"").trim().toLowerCase();
+  const l=TPL.slice().sort((a,b)=>(a.k||"z").localeCompare(b.k||"z")||a.n.localeCompare(b.n,"ja")).filter(t=>!q||t.n.toLowerCase().includes(q));
+  $("#dh").textContent=`登録済みアイコン(${TPL.length}件${q?`・表示${l.length}件`:""})`;
+  $("#dl").innerHTML=l.map((t,i)=>`<div class="dr" data-o="${esc(t.n)}"><canvas width="16" height="16" data-ci="${i}"></canvas><div><input class="dn" value="${esc(t.n)}" aria-label="生徒名"><div class="rw"><select class="dk" aria-label="ロール">${["st","sp",""].map(v=>`<option value="${v}"${(t.k||"")===v?" selected":""}>${v==="st"?"ST":v==="sp"?"SP":"未設定"}</option>`).join("")}</select><button class="del" data-sv>保存</button><button class="del" data-dx>削除</button></div></div></div>`).join("");
+  l.forEach((t,i)=>{const x=$(`[data-ci="${i}"]`).getContext("2d"),id=x.createImageData(16,16);for(let p=0;p<256;p++){id.data[p*4]=t.f[p*3];id.data[p*4+1]=t.f[p*3+1];id.data[p*4+2]=t.f[p*3+2];id.data[p*4+3]=255}x.putImageData(id,0,0)});
+  $("#dm").textContent=TPL.length?(l.length?"":"該当なし"):"まだ登録がありません";
+}
+$("#dq").oninput=drawDL;
+$("#dl").onclick=async e=>{
+  const row=e.target.closest(".dr");if(!row)return;
+  const o=row.dataset.o,t=TPL.find(x=>x.n===o);if(!t)return;
+  if(e.target.closest("[data-dx]")){
+    if(!confirm(`「${o}」を辞書から削除しますか?`))return;
+    try{await api("DELETE","/icons/"+encodeURIComponent(o))}catch(err){alert("削除に失敗しました: "+(err&&err.message||""));return}
+    syncAll();return;
+  }
+  if(e.target.closest("[data-sv]")){
+    const n=row.querySelector(".dn").value.trim(),k=row.querySelector(".dk").value||null;
+    if(!n){alert("名前が空です");return}
+    if(n===o&&(t.k||null)===k)return;
+    if(n!==o&&TPL.some(x=>x.n===n)&&!confirm(`「${n}」はすでに登録済みです。そのアイコンを上書きしますか?`))return;
+    try{await api("POST","/icons",{n,k,d:t.d});if(n!==o)await api("DELETE","/icons/"+encodeURIComponent(o))}catch(err){alert("保存に失敗しました: "+(err&&err.message||""));return}
+    syncAll();
+  }
 };
 (async()=>{
   const L=LS.get("bat-local",{});
