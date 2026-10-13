@@ -68,6 +68,9 @@ select+input{margin-top:6px}
 .ig canvas{width:100%;border-radius:6px;background:var(--sub);display:block}
 .ig input{padding:6px;font-size:13px;margin-top:3px}
 .ig .lb{grid-column:1/-1;margin:4px 0 0}
+.ir{display:grid;grid-template-columns:54px 1fr auto;gap:8px;align-items:center;margin-top:6px}
+.ir img{width:54px;height:45px;border-radius:6px;background:var(--sub);display:block}
+.ir input{padding:6px;font-size:14px}
 details.card summary{cursor:pointer;font-weight:700;font-size:13px}
 .stt{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px}
 .stt td{padding:4px;border-bottom:1px solid var(--bd);vertical-align:top}
@@ -125,12 +128,22 @@ details.card summary{cursor:pointer;font-weight:700;font-size:13px}
     <div class="card"><h3>生徒リスト(プルダウンの中身)</h3>
       <label for="lst" style="margin-top:0">ST生徒(1行に1名)</label><textarea id="lst" rows="8"></textarea>
       <label for="lsp">SP生徒(1行に1名)</label><textarea id="lsp" rows="8"></textarea>
-      <button class="btn" id="lsb" style="margin-top:10px">生徒リストを保存</button><p id="lsm" class="mut"></p>
+      <label for="lth">認識のしきい値(0.3〜0.95。低いほど緩く、誤認しやすくなる)</label><input id="lth" type="number" step="0.01" min="0.3" max="0.95" inputmode="decimal">
+      <button class="btn" id="lsb" style="margin-top:10px">生徒リストとしきい値を保存</button><p id="lsm" class="mut"></p>
       <p class="mut">アイコンを登録した生徒は、ここに書かなくてもプルダウンに出ます</p></div>
-    <div class="card"><h3>アイコン登録</h3>
+    <div class="card"><h3>アイコン登録(画像から)</h3>
+      <label for="ikd" style="margin-top:0">ロール(選んだ画像すべてに適用)</label>
+      <select id="ikd"><option value="st">ST(STRIKER・枠1〜4)</option><option value="sp">SP(SPECIAL・枠5〜6)</option></select>
+      <div style="position:relative;margin-top:8px"><div class="btn out">アイコン画像を選ぶ(複数可)</div>
+      <input type="file" id="ifl" accept="image/*" multiple aria-label="アイコン画像を選ぶ" style="position:absolute;left:0;top:0;width:100%;height:100%;opacity:0;font-size:16px"></div>
+      <p class="mut" style="margin:6px 0 0">ファイル名がそのまま生徒名になります(例: ヒナ(ドレス).png)。登録前に名前は直せます。同じ名前は上書きされます</p>
+      <div id="irw"></div>
+      <button class="btn" id="igo" style="margin-top:10px" hidden>登録する</button><p id="ims" class="mut"></p>
+    </div>
+    <div class="card"><h3>スクショで認識テスト・登録(予備)</h3>
       <div style="position:relative"><div class="btn out">スクショを選ぶ</div>
       <input type="file" id="ish" accept="image/*" aria-label="アイコン登録用のスクショを選ぶ" style="position:absolute;left:0;top:0;width:100%;height:100%;opacity:0;font-size:16px"></div>
-      <p class="mut" style="margin:6px 0 0">登録したい枠に生徒名を入力します。薄い文字は現在の辞書での認識結果です。名前を入れた枠だけ登録します(同じ名前は上書き)</p>
+      <p class="mut" style="margin:6px 0 0">バトル履歴のスクショで認識結果を確認できます。薄い文字は認識結果、各枠の下の小さい文字は一番近い候補と類似度です。登録したい枠に生徒名を入力します。名前を入れた枠だけ登録します(同じ名前は上書き)</p>
       <div class="ig" id="ig"></div><datalist id="adl"></datalist>
       <button class="btn" id="ib" style="margin-top:10px" hidden>名前を入れた枠を登録</button><p id="im" class="mut"></p>
       <details style="margin-top:8px"><summary>登録済みアイコン(タップで削除)</summary><div class="chips" id="il"></div></details>
@@ -330,7 +343,7 @@ function startEdit(id){
 async function imgData(f){const b=await createImageBitmap(f),c=document.createElement("canvas");c.width=b.width;c.height=b.height;const x=c.getContext("2d",{willReadFrequently:true});x.drawImage(b,0,0);return x.getImageData(0,0,b.width,b.height)}
 function matchAll(im){
   const th=S.th;
-  return SX.map((_,i)=>{const b=slotBox(im.width,im.height,i),z=norm(feat(im,b));let bn="",bs=-1;for(const t of TPL){const s=sim(z,t.z);if(s>bs){bs=s;bn=t.n}}return{n:bs>=th?bn:"",s:bs}});
+  return SX.map((_,i)=>{const b=slotBox(im.width,im.height,i),z=norm(feat(im,b));let bn="",bs=-1;for(const t of TPL){const s=sim(z,t.z);if(s>bs){bs=s;bn=t.n}}return{n:bs>=th?bn:"",s:bs,b:bn}});
 }
 async function recog(){
   const f=$("#shot").files[0],st=$("#rst");if(!f)return;
@@ -483,13 +496,14 @@ $("#ob").onclick=()=>{
 /* 管理者: 生徒リストとアイコン辞書の編集(キーを入れた端末のみ表示) */
 const applyMode=()=>{$("#adm").hidden=!KEY;if(KEY)fillAdm()};
 function fillAdm(){
+  $("#lth").value=S.th;
   $("#lst").value=S.st.join("\n");$("#lsp").value=S.sp.join("\n");
   $("#adl").innerHTML=[...new Set([...kindList("st"),...kindList("sp")])].map(x=>`<option value="${esc(x)}">`).join("");
   $("#il").innerHTML=TPL.length?TPL.slice().sort((a,b)=>a.n.localeCompare(b.n,"ja")).map(t=>`<button class="chip" data-di="${esc(t.n)}">${esc(t.n)}${t.k?` <small>${t.k}</small>`:""}</button>`).join(""):`<span class="mut">まだ登録がありません</span>`;
 }
 $("#lsb").onclick=async()=>{
   const f=t=>[...new Set($(t).value.split("\n").map(s=>s.trim()).filter(Boolean))];
-  try{await api("PUT","/config",{students:{st:f("#lst"),sp:f("#lsp")}})}catch(e){$("#lsm").textContent="保存に失敗しました: "+(e&&e.message||"");return}
+  try{await api("PUT","/config",{students:{st:f("#lst"),sp:f("#lsp")},th:parseFloat($("#lth").value)||undefined})}catch(e){$("#lsm").textContent="保存に失敗しました: "+(e&&e.message||"");return}
   $("#lsm").textContent="保存しました";syncAll();
 };
 const b64=u=>btoa(String.fromCharCode(...u));
@@ -503,7 +517,7 @@ $("#ish").onchange=async()=>{
     let h="";
     SX.forEach((_,i)=>{
       if(i===0||i===6)h+=`<div class="lb">${i?"相手の防衛":"自分の攻撃"}</div>`;
-      h+=`<div><canvas width="72" height="60" data-c="${i}"></canvas><input list="adl" data-n="${i}" placeholder="${esc(m[i].n)||"未認識"}" aria-label="${NM[i%6]}の生徒名"></div>`;
+      h+=`<div><canvas width="72" height="60" data-c="${i}"></canvas><input list="adl" data-n="${i}" placeholder="${esc(m[i].n)||"未認識"}" aria-label="${NM[i%6]}の生徒名"><div class="mut" style="font-size:10px">${m[i].b?esc(m[i].b)+" "+m[i].s.toFixed(2):"－"}</div></div>`;
     });
     $("#ig").innerHTML=h;
     SX.forEach((_,i)=>{const b=slotBox(im.width,im.height,i);$(`[data-c="${i}"]`).getContext("2d").drawImage(big,b.x,b.y,b.w,b.h,0,0,72,60)});
@@ -524,6 +538,47 @@ $("#ib").onclick=async()=>{
   btn.disabled=false;
   $("#im").textContent=err?`${ok}件登録後に失敗しました: ${err}`:`${ok}件登録しました`;
   if(!err){AD=null;$("#ig").innerHTML="";btn.hidden=true}
+  syncAll();
+};
+/* 画像からのアイコン登録: 画像全体をゲーム内アイコンの外接矩形とみなし、スクショの枠と同じ割合の中央部分で特徴量を作る */
+const IW=0.76,IH=0.79;
+async function iconData(f){
+  const b=await createImageBitmap(f),c=document.createElement("canvas");c.width=b.width;c.height=b.height;
+  const x=c.getContext("2d",{willReadFrequently:true});x.fillStyle="#eaf3fa";x.fillRect(0,0,c.width,c.height);x.drawImage(b,0,0);
+  return{im:x.getImageData(0,0,b.width,b.height),cv:c};
+}
+let IR=[];
+function drawIR(){
+  $("#irw").innerHTML=IR.map((r,i)=>`<div class="ir"><img src="${r.th}" alt=""><input data-in="${i}" value="${esc(r.n)}" aria-label="生徒名"><button class="del" data-ix="${i}">${r.k==="st"?"ST":"SP"} ×</button></div>`).join("");
+  $("#igo").hidden=!IR.length;$("#igo").textContent=`${IR.length}件を登録する`;
+}
+$("#ifl").onchange=async()=>{
+  const fs=[...$("#ifl").files];if(!fs.length)return;
+  const k=$("#ikd").value;$("#ims").textContent="読み込み中…";let bad=0;
+  for(const f of fs){
+    try{
+      const{im,cv}=await iconData(f);
+      const bx={x:Math.round(im.width*(1-IW)/2),y:Math.round(im.height*(1-IH)/2),w:Math.round(im.width*IW),h:Math.round(im.height*IH)};
+      const t=document.createElement("canvas");t.width=72;t.height=60;t.getContext("2d").drawImage(cv,bx.x,bx.y,bx.w,bx.h,0,0,72,60);
+      IR.push({n:f.name.replace(/\.[^.]+$/,"").trim(),k,d:b64(feat(im,bx)),th:t.toDataURL()});
+    }catch(e){bad++}
+  }
+  $("#ifl").value="";drawIR();
+  $("#ims").textContent=bad?`${bad}件は画像として読み込めませんでした`:"";
+};
+$("#irw").oninput=e=>{const t=e.target.closest("[data-in]");if(t)IR[+t.dataset.in].n=t.value};
+$("#irw").onclick=e=>{const b=e.target.closest("[data-ix]");if(b){IR.splice(+b.dataset.ix,1);drawIR()}};
+$("#igo").onclick=async()=>{
+  const jobs=IR.map(r=>({n:r.n.trim(),k:r.k,d:r.d}));
+  if(jobs.some(j=>!j.n)){$("#ims").textContent="名前が空の行があります";return}
+  const ow=jobs.filter(j=>TPL.some(t=>t.n===j.n)).length;
+  if(ow&&!confirm(`${ow}件は登録済みの名前です。上書きしますか?`))return;
+  const btn=$("#igo");btn.disabled=true;let done=0,err="",i=0;
+  const run=async()=>{while(i<jobs.length&&!err){const j=jobs[i++];try{await api("POST","/icons",j);done++}catch(e){err=e&&e.message||"error"}$("#ims").textContent=`登録中 ${done}/${jobs.length}`}};
+  await Promise.all([run(),run(),run(),run()]);
+  btn.disabled=false;
+  $("#ims").textContent=err?`${done}件登録後に失敗しました: ${err}`:`${done}件登録しました`;
+  if(!err){IR=[];drawIR()}
   syncAll();
 };
 $("#il").onclick=async e=>{
