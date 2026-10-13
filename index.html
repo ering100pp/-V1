@@ -137,7 +137,7 @@ const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&g
 const NM=["STR1","STR2","STR3","STR4","SP1","SP2"],IDX=[0,1,2,3,4,5],GK=[0,4,5];
 const GR=["★3","★4","固1","固2","固3","固4"];
 /* バックエンド(サークル共通)。同じ場所から配信するなら空のまま。別オリジンなら "https://example.com/api" のように書く */
-const API_BASE="";
+const API_BASE = "https://tactics-log-db.kida-ken-1002.workers.dev";
 /* S: records/students/growth/th はサーバー由来。players/cont はこの端末だけの設定 */
 let S={records:[],st:[],sp:[],growth:GR.slice(),th:0.75,players:[],me:"",cont:true};
 const blank=()=>({n:"",me:"",r:"",d:Array(6).fill(""),g:{0:"",4:"",5:""},p:"",a:Array(6).fill(""),ga:{0:"",4:"",5:""},m:""});
