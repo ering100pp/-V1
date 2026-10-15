@@ -171,7 +171,7 @@ button,.chip,.rb{touch-action:manipulation}
 
 <section id="st" hidden>
   <h1 id="sth" style="user-select:none">設定</h1>
-  <div class="card" id="kc"><label for="ai" style="margin-top:0">サーバーURL</label><input id="ai" type="url" autocomplete="off" placeholder="https://〜.workers.dev"><label for="ki">キー(メンバー用または管理者用)</label><input id="ki" type="password" autocomplete="off" placeholder="キーを入力"><button class="btn" id="ks" style="margin-top:8px">保存</button><button class="btn out" id="kx" style="margin-top:8px">この端末のキーを消す</button></div>
+  <div class="card" id="kc" hidden><label for="ai" style="margin-top:0">サーバーURL</label><input id="ai" type="url" autocomplete="off" placeholder="https://〜.workers.dev"><label for="ki">キー(メンバー用または管理者用)</label><input id="ki" type="password" autocomplete="off" placeholder="キーを入力"><button class="btn" id="ks" style="margin-top:8px">保存</button><button class="btn out" id="kx" style="margin-top:8px">この端末のキーを消す</button></div>
   <div class="card">
     <label for="oq" style="margin-top:0">プレーヤー名の候補(1行に1名)</label>
     <textarea id="oq" rows="10"></textarea>
@@ -272,8 +272,8 @@ const grp=n=>VMAP.get(n)||n;
 const isH=n=>VBASE.has(hw(n));
 const vkind=b=>{const t=TPL.find(x=>hw(x.base)===b&&x.k);return t?t.k:"st"};
 /* バックエンド(サークル共通)。同じ場所から配信するなら空のまま。別オリジンなら "https://example.com/api" のように書く */
-/* サーバーURLはHTMLに書かない。設定タブ(または #api=URL)で入力した値をこの端末に保存する(localStorage "bat-api") */
-let API_BASE="";try{const u=localStorage.getItem("bat-api");if(u)API_BASE=u.replace(/\/+$/,"")}catch(e){}
+/* 既定のサーバーURL(メンバーは入力不要)。URLが見えてもキーが無ければサーバーは拒否する前提。端末ごとの上書き: 設定タブ・#api=URL・localStorage "bat-api" */
+let API_BASE="https://tactics-log-db.kida-ken-1002.workers.dev";try{const u=localStorage.getItem("bat-api");if(u)API_BASE=u.replace(/\/+$/,"")}catch(e){}
 /* 書き込み用キー。HTMLには書かず、設定タブで入力した値をこの端末に保存 */
 let KEY="";try{KEY=localStorage.getItem("bat-key")||""}catch(e){}
 if(/^#(key|api)=/.test(location.hash)){
@@ -1125,13 +1125,14 @@ $("#plb").onclick=async()=>{
   $("#bkm").textContent="共通候補に保存しました";syncAll();
 };
 let tp=0,tpt=0;
+$("#sth").onclick=()=>{const n=Date.now();tp=n-tpt>3000?1:tp+1;tpt=n;if(tp>=7){tp=0;$("#kc").hidden=false;$("#ai").focus()}};
 
 $("#ks").onclick=()=>{const a=$("#ai").value.trim().replace(/\/+$/,""),v=$("#ki").value.trim();if(!a&&!v)return;
   if(a&&!/^https?:\/\//.test(a)){toast("サーバーURLは https:// から入力してください");return}
   if(a){API_BASE=a;try{localStorage.setItem("bat-api",a)}catch(e){rep("端末への保存",e)}}
   if(v){KEY=v;try{localStorage.setItem("bat-key",KEY)}catch(e){rep("端末への保存",e)}}
-  $("#ki").value="";applyMode();syncAll(true)};
-$("#kx").onclick=async()=>{if(!await ask("この端末のキーを消します。"))return;KEY="";ROLE="";LS.set("bat-role","");try{localStorage.removeItem("bat-key")}catch(e){}applyMode()};
+  $("#ki").value="";$("#kc").hidden=true;applyMode();syncAll(true)};
+$("#kx").onclick=async()=>{if(!await ask("この端末のキーを消します。"))return;KEY="";ROLE="";LS.set("bat-role","");try{localStorage.removeItem("bat-key")}catch(e){}$("#kc").hidden=false;applyMode()};
 $("#ssd").querySelector("summary").onclick=()=>{SSU=!$("#ssd").open};
 (async()=>{
   $("#vr").textContent="戦術対抗戦ログ "+VER;
@@ -1143,7 +1144,7 @@ $("#ssd").querySelector("summary").onclick=()=>{SSU=!$("#ssd").open};
   try{if(C.config)applyConfig(C.config);if(Array.isArray(C.records))S.records=C.records.map(normRec);rebuild(DBG("bai-cache",[]))}catch(e){warn("cache",e)}
   $("#oq").value=S.players.join("\n");
   applyMode();
-  $("#ai").value=API_BASE;applyTheme(theme);refreshDL();drawForm();renderHist();
+  $("#ai").value=API_BASE;$("#kc").hidden=!!API_BASE;applyTheme(theme);refreshDL();drawForm();renderHist();
   syncAll(false,true).then(flushQ);
 })();
 const STX=[];
