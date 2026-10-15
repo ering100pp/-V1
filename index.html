@@ -2,11 +2,11 @@
 <html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>戦術対抗戦ログ</title>
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0e8fa8"><meta name="color-scheme" content="light dark"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="戦術ログ">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" id="tc" content="#0e8fa8"><meta name="color-scheme" content="light dark"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="戦術ログ">
 <style>
-:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);--bg:#eef3f5;--card:#fff;--fg:#17222b;--mut:#5a6a76;--bd:#d3dde3;--ac:#0b7a91;--sub:#e1eaee;--w:#1a8a4a;--l:#c0392b;--warn:#e0a000}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1519;--card:#192229;--fg:#e6eef2;--mut:#8da0ac;--bd:#2e3d47;--ac:#2bb3cf;--sub:#222f37;--w:#4cc27a;--l:#ef7a6c}}
-:root[data-theme="dark"]{--bg:#0f1519;--card:#192229;--fg:#e6eef2;--mut:#8da0ac;--bd:#2e3d47;--ac:#2bb3cf;--sub:#222f37;--w:#4cc27a;--l:#ef7a6c}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);--bg:#eef3f5;--card:#fff;--fg:#17222b;--mut:#5a6a76;--bd:#d3dde3;--ac:#0b7a91;--sub:#e1eaee;--w:#167a40;--l:#c0392b;--warn:#e0a000;--on:#fff}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1519;--card:#192229;--fg:#e6eef2;--mut:#8da0ac;--bd:#2e3d47;--ac:#2bb3cf;--sub:#222f37;--w:#4cc27a;--l:#ef7a6c;--on:#0b1418}}
+:root[data-theme="dark"]{--bg:#0f1519;--card:#192229;--fg:#e6eef2;--mut:#8da0ac;--bd:#2e3d47;--ac:#2bb3cf;--sub:#222f37;--w:#4cc27a;--l:#ef7a6c;--on:#0b1418}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 [hidden]{display:none!important}
 body{margin:0;padding-bottom:calc(78px + env(safe-area-inset-bottom,0px));background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif}
@@ -16,18 +16,18 @@ h1{font-size:17px;margin:4px 0 8px}h3{font-size:14px;margin:0 0 8px}
 .card{background:var(--card);border-radius:14px;padding:12px;margin-bottom:10px}
 label{display:block;font-weight:700;font-size:12px;color:var(--mut);margin:8px 0 3px}
 input,select,textarea{width:100%;box-sizing:border-box;padding:10px;border:1px solid var(--bd);border-radius:8px;background:var(--card);color:var(--fg);font-size:16px}
-.btn{display:block;width:100%;box-sizing:border-box;padding:12px;border:0;border-radius:10px;background:var(--ac);color:#fff;font-weight:700;font-size:15px;text-align:center;cursor:pointer}
+.btn{display:block;width:100%;box-sizing:border-box;padding:12px;border:0;border-radius:10px;background:var(--ac);color:var(--on);font-weight:700;font-size:15px;text-align:center;cursor:pointer}
 .btn:disabled{opacity:.5}
 .btn.out{background:var(--sub);color:var(--fg)}
-.mut{color:var(--mut);font-size:12px}
+.mut{color:var(--mut);font-size:13px}
 .res{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .rb{padding:14px;border:2px solid var(--bd);border-radius:10px;background:var(--card);color:var(--fg);font-weight:800;font-size:17px}
-.rb.on[data-r="WIN"]{background:var(--w);border-color:var(--w);color:#fff}
-.rb.on[data-r="LOSE"]{background:var(--l);border-color:var(--l);color:#fff}
+.rb.on[data-r="WIN"]{background:var(--w);border-color:var(--w);color:var(--on)}
+.rb.on[data-r="LOSE"]{background:var(--l);border-color:var(--l);color:var(--on)}
 .bo{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;align-items:start;max-width:420px}
 .bo .sq{border-radius:7px}
-.bo .nm{font-size:9.5px}
-.bo .pos{font-size:8px;padding:0 3px}
+.bo .nm{font-size:10.5px}
+.bo .pos{font-size:9.5px;padding:0 3px}
 .sq{position:relative;display:flex;align-items:center;justify-content:center;width:100%;aspect-ratio:1/1;border-radius:10px;overflow:hidden;background:var(--sub);color:var(--mut);box-sizing:border-box}
 .sq img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .pos{position:absolute;left:2px;top:2px;z-index:1;font-size:9px;line-height:1.3;padding:0 4px;border-radius:4px;background:rgba(0,0,0,.55);color:#fff;font-weight:400}
@@ -40,8 +40,8 @@ input,select,textarea{width:100%;box-sizing:border-box;padding:10px;border:1px s
 .slot .nm{font-weight:600}
 .fm,.ff{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin-top:3px}
 .fm .sq,.ff .sq{border-radius:6px}
-.fm .nm,.ff .nm{font-size:9px}
-.fm .pos,.ff .pos{font-size:8px;padding:0 2px}
+.fm .nm,.ff .nm{font-size:10.5px}
+.fm .pos,.ff .pos{font-size:9.5px;padding:0 2px}
 .ff button{display:block;width:100%;padding:0;border:0;background:none;color:var(--fg);font:inherit}
 .ff button.set .sq{outline:2px solid var(--ac)}
 @media(min-width:600px){.bo{max-width:none;gap:8px}.bo .nm,.fm .nm,.ff .nm{font-size:12px}.bo .pos,.fm .pos,.ff .pos{font-size:10px;padding:0 4px}.slot .sq{font-size:24px}.fm,.ff{gap:8px}}
@@ -53,33 +53,32 @@ input,select,textarea{width:100%;box-sizing:border-box;padding:10px;border:1px s
 @media(max-width:599px){.wrap{padding:10px 8px}.card{padding:12px 8px}.bo{gap:4px;margin:0 -2px}}
 .ck{display:flex;align-items:center;margin:0}
 .ck input{width:22px;height:22px;padding:0}
-select.gr{width:100%;margin-top:4px;padding:6px 2px;border:0;border-radius:8px;background:var(--sub);color:var(--ac);font-weight:700;font-size:12px;text-align:center;text-align-last:center}
-.eb{background:var(--ac);color:#fff;border-radius:10px;padding:8px 12px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
-.eb button{border:0;background:#fff3;color:#fff;border-radius:6px;padding:4px 10px}
+.eb{background:var(--ac);color:var(--on);border-radius:10px;padding:8px 12px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.eb button{border:0;background:#ffffff40;color:var(--on);border-radius:6px;padding:10px 14px;min-height:44px}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.chip{padding:6px 11px;border:1px solid var(--bd);border-radius:16px;background:var(--card);color:var(--fg);font-size:13px}
-.chip.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.chip{padding:9px 13px;border:1px solid var(--bd);border-radius:16px;background:var(--card);color:var(--fg);font-size:13px;min-height:44px;display:inline-flex;align-items:center}
+.chip.on{background:var(--ac);color:var(--on);border-color:var(--ac)}
 .chip.warn{border-color:var(--warn);color:var(--fg);background:rgba(224,160,0,.14)}
 .br{flex-basis:100%;height:0}
-.rc{border-left:5px solid var(--bd);border-radius:12px;padding:10px;margin-bottom:10px;background:var(--card)}
+.rc{border-left:5px solid var(--bd);border-radius:12px;padding:8px 10px;margin-bottom:8px;background:var(--card)}
 .rc.win{border-left-color:var(--w)}.rc.lose{border-left-color:var(--l)}
 .rh{display:flex;align-items:center;gap:8px}
-.bd{padding:2px 10px;border-radius:12px;color:#fff;font-weight:700;font-size:13px;background:var(--mut)}
+.bd{padding:2px 10px;border-radius:12px;color:var(--on);font-weight:700;font-size:13px;background:var(--mut)}
 .bd.w{background:var(--w)}.bd.l{background:var(--l)}
 .rt{margin-left:auto;color:var(--mut);font-size:12px}
 .lb{font-size:12px;font-weight:700;color:var(--mut);margin-top:8px}
-.act{text-align:right;margin-top:6px}
-.del{border:1px solid var(--bd);background:var(--card);color:var(--fg);border-radius:6px;padding:3px 9px;font-size:12px;margin-left:6px}
+.act{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;margin-top:6px}
+.del{border:1px solid var(--bd);background:var(--card);color:var(--fg);border-radius:6px;padding:12px 14px;min-height:44px;font-size:13px;margin-left:8px}
 #nv{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--card);border-top:1px solid var(--bd);padding:6px 0 calc(6px + env(safe-area-inset-bottom,0px));z-index:5}
 #nv button{flex:1;border:0;background:none;color:var(--mut);font-weight:700;font-size:14px;padding:10px 0}
 #nv button.on{color:var(--ac)}
 #sh{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;z-index:9}
 .sc{background:var(--card);width:100%;max-height:78%;overflow:auto;border-radius:18px 18px 0 0;padding:14px 14px calc(14px + env(safe-area-inset-bottom,0px));box-sizing:border-box}
-.sht{display:flex;justify-content:space-between;margin-bottom:8px}.sht button{border:0;background:none;color:var(--fg);font-size:22px}
+.sht{display:flex;justify-content:space-between;margin-bottom:8px}.sht button{border:0;background:none;color:var(--fg);font-size:22px;min-width:44px;min-height:44px}
 .hd{display:flex;justify-content:space-between;align-items:center}.hd .chip{margin:0}
 select+input{margin-top:6px}
-#ts{position:fixed;left:12px;right:12px;bottom:calc(70px + env(safe-area-inset-bottom,0px));max-width:696px;margin:0 auto;background:#222;color:#fff;border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;z-index:8}
-#ts button{border:0;background:none;color:#7dd3e8;font-weight:700;font-size:14px}
+#ts{position:fixed;left:12px;right:12px;bottom:calc(128px + env(safe-area-inset-bottom,0px));max-width:696px;margin:0 auto;background:#222;color:#fff;border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;z-index:8}
+#ts button{border:0;background:none;color:#7dd3e8;font-weight:700;font-size:14px;min-height:44px;padding:0 8px}
 .ig{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
 .ig canvas{width:100%;border-radius:6px;background:var(--sub);display:block}
 .ig input{padding:6px;font-size:16px;margin-top:3px}
@@ -95,23 +94,21 @@ select+input{margin-top:6px}
 .dr select{width:auto;padding:6px}
 details.card summary{cursor:pointer;font-weight:700;font-size:13px}
 details.card[open]>summary{margin-bottom:8px}
-.stt{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px}
+.stt{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}
 .stt td{padding:4px;border-bottom:1px solid var(--bd);vertical-align:top}
 .stt td.r{text-align:right;white-space:nowrap}
-.sbd{display:inline-block;background:var(--ac);color:#fff;border-radius:10px;padding:1px 8px;font-size:12px;font-weight:700;vertical-align:middle}
-.rc{padding:8px 10px;margin-bottom:8px;background:var(--card)}
+.sbd{display:inline-block;background:var(--ac);color:var(--on);border-radius:10px;padding:1px 8px;font-size:12px;font-weight:700;vertical-align:middle}
 .rc.win{background:color-mix(in srgb,var(--w) 7%,var(--card))}.rc.lose{background:color-mix(in srgb,var(--l) 7%,var(--card))}
 .rc .fm{margin-top:6px}
 .rn{font-size:15px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dh{display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:var(--mut);margin:14px 2px 6px}
-details.at summary{cursor:pointer;font-size:12px;font-weight:700;color:var(--ac);padding:8px 0 2px;list-style:none}
+details.at summary{cursor:pointer;font-size:12px;font-weight:700;color:var(--ac);padding:2px 0 0;list-style:none}
 details.at summary::-webkit-details-marker{display:none}
 details.at summary::before{content:"▸ "}
 details.at[open] summary::before{content:"▾ "}
-details.at summary{padding:2px 0 0}
 .seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px}
 .seg button{padding:10px;border:2px solid var(--bd);border-radius:10px;background:var(--card);color:var(--fg);font-weight:800;font-size:15px}
-.seg button.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.seg button.on{background:var(--ac);border-color:var(--ac);color:var(--on)}
 .ar{border-top:1px solid var(--bd);margin-top:6px;padding-top:6px}
 @media(min-width:900px){
 #sh{align-items:center;justify-content:center}
@@ -120,11 +117,15 @@ details.at summary{padding:2px 0 0}
 #nv{padding-left:calc((100% - 720px)/2);padding-right:calc((100% - 720px)/2)}
 }
 :focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.sr{display:grid;grid-template-columns:auto 76px 1fr auto;gap:6px;align-items:center;margin-top:6px}.sr .del{margin:0}
 button,.chip,.rb{touch-action:manipulation}
-.chip{padding:9px 13px}.del{padding:9px 12px;margin-left:8px}
-.act{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
-.sc{overscroll-behavior:contain}
+.sc{overscroll-behavior:contain}.sc:focus{outline:none}
 #sv{position:sticky;bottom:calc(64px + env(safe-area-inset-bottom,0px));z-index:4}
+.flag{position:absolute;right:2px;bottom:2px;z-index:1;font-size:9px;line-height:1.3;padding:0 4px;border-radius:4px;background:var(--warn);color:#000;font-weight:700}
+#dg{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:20;padding:16px}
+.dgc{background:var(--card);border-radius:14px;padding:16px;max-width:420px;width:100%;box-sizing:border-box}
+.dgc p{white-space:pre-line;margin:0 0 14px}
+.dga{display:flex;gap:8px}.dga .btn{flex:1}
 </style></head><body>
 <div class="wrap">
 <div class="hd"><h1>戦術対抗戦ログ <span class="sbd" id="sbd"></span></h1><div style="display:flex;gap:6px"><button class="chip" id="rl">再読込</button><button class="chip" id="th">テーマ</button></div></div>
@@ -136,7 +137,7 @@ button,.chip,.rb{touch-action:manipulation}
   <div class="card">
     <div style="position:relative"><div class="btn out">スクショから読み取る</div>
     <input type="file" id="shot" accept="image/*" multiple aria-label="戦闘履歴のスクショを選ぶ" style="position:absolute;left:0;top:0;width:100%;height:100%;opacity:0;font-size:16px"></div>
-    <p id="rst" class="mut" style="margin:6px 0 0"></p>
+    <p id="rst" class="mut" role="status" aria-live="polite" style="margin:6px 0 0"></p>
     <div class="chips"><button class="chip warn" id="mq" hidden></button><button class="chip" id="qs" hidden></button><button class="chip" id="qx" hidden>残りをやめる</button></div>
   </div>
   <div class="card">
@@ -148,7 +149,7 @@ button,.chip,.rb{touch-action:manipulation}
   <div class="card"><h3 id="ta">自分の攻撃</h3><div class="bo" id="ba"></div>
     <div class="chips"><button class="chip" id="ca">攻撃編成をクリア</button></div></div>
   <div class="card"><label for="m" style="margin-top:0">メモ</label><textarea id="m" rows="2"></textarea></div>
-  <button class="btn" id="sv">保存</button><p id="msg" class="mut" style="text-align:center"></p>
+  <button class="btn" id="sv">保存</button><p id="msg" class="mut" role="status" aria-live="polite" style="text-align:center"></p>
   <div class="chips" style="justify-content:center"><button class="chip" id="ct"></button></div>
 </section>
 
@@ -170,11 +171,11 @@ button,.chip,.rb{touch-action:manipulation}
 
 <section id="st" hidden>
   <h1 id="sth" style="user-select:none">設定</h1>
-  <div class="card" id="kc" hidden><label for="ki" style="margin-top:0">管理キー</label><input id="ki" type="password" autocomplete="off" placeholder="キーを入力"><button class="btn" id="ks" style="margin-top:8px">保存</button><button class="btn out" id="kx" style="margin-top:8px">この端末のキーを消す</button></div>
+  <div class="card" id="kc"><label for="ai" style="margin-top:0">サーバーURL</label><input id="ai" type="url" autocomplete="off" placeholder="https://〜.workers.dev"><label for="ki">キー(メンバー用または管理者用)</label><input id="ki" type="password" autocomplete="off" placeholder="キーを入力"><button class="btn" id="ks" style="margin-top:8px">保存</button><button class="btn out" id="kx" style="margin-top:8px">この端末のキーを消す</button></div>
   <div class="card">
     <label for="oq" style="margin-top:0">プレーヤー名の候補(1行に1名)</label>
     <textarea id="oq" rows="10"></textarea>
-    <button class="btn" id="ob" style="margin-top:10px">保存</button><p id="om" class="mut"></p>
+    <button class="btn" id="ob" style="margin-top:10px">保存</button><p id="om" class="mut" role="status" aria-live="polite"></p>
   </div>
   <div id="adm" hidden>
     <p id="kinfo" class="mut" style="margin:0 0 8px"></p>
@@ -182,7 +183,13 @@ button,.chip,.rb{touch-action:manipulation}
       <label for="lst" style="margin-top:0">ST生徒(1行に1名)</label><textarea id="lst" rows="8"></textarea>
       <label for="lsp">SP生徒(1行に1名)</label><textarea id="lsp" rows="8"></textarea>
       <label for="lth">認識のしきい値(0.3〜0.95)</label><input id="lth" type="number" step="0.01" min="0.3" max="0.95" inputmode="decimal">
-      <button class="btn" id="lsb" style="margin-top:10px">生徒リストとしきい値を保存</button><p id="lsm" class="mut"></p></div>
+      <button class="btn" id="lsb" style="margin-top:10px">生徒リストとしきい値を保存</button><p id="lsm" class="mut" role="status" aria-live="polite"></p></div>
+    <div class="card"><h3>認識の精度(この端末の実績)</h3><div id="cal"></div><button class="btn out" id="calx" style="margin-top:8px">実績を消す</button></div>
+    <div class="card"><h3>シーズン設定</h3>
+      <p class="mut" style="margin:0 0 4px">開始日時(日本時間)から次のシーズンが始まります。例: S12を11/11 0:00に。最古の行より前はその番号-1として扱います。保存済みの記録のシーズンは変わりません</p>
+      <div id="sew"></div>
+      <div class="chips"><button class="chip" id="seadd">シーズンを追加</button></div>
+      <button class="btn" id="sesv" style="margin-top:10px">シーズン設定を保存</button><p id="semsg" class="mut" role="status" aria-live="polite"></p></div>
     <div class="card"><h3>アイコン登録(画像から)</h3>
       <label for="ikd" style="margin-top:0">ロール(選んだ画像すべてに適用)</label>
       <select id="ikd"><option value="st">ST(STRIKER・枠1〜4)</option><option value="sp">SP(SPECIAL・枠5〜6)</option></select>
@@ -190,35 +197,37 @@ button,.chip,.rb{touch-action:manipulation}
       <input type="file" id="ifl" accept="image/*" multiple aria-label="アイコン画像を選ぶ" style="position:absolute;left:0;top:0;width:100%;height:100%;opacity:0;font-size:16px"></div>
       <p class="mut" style="margin:6px 0 0">ファイル名が生徒名になります(例: ヒナ(ドレス).png)。同じ名前は上書き</p>
       <div id="irw"></div>
-      <button class="btn" id="igo" style="margin-top:10px" hidden>登録する</button><p id="ims" class="mut"></p>
+      <button class="btn" id="igo" style="margin-top:10px" hidden>登録する</button><p id="ims" class="mut" role="status" aria-live="polite"></p>
     </div>
     <details class="card" id="dd"><summary id="dh">登録済みアイコン</summary>
       <input id="dq" placeholder="名前で絞り込み" autocomplete="off" aria-label="登録済みアイコンを絞り込み">
       <div class="chips"><button class="chip" id="dsa">表示中を全選択/解除</button><button class="chip warn" id="ddel">選択を削除(0件)</button></div>
-      <div id="dl"></div><p id="dm" class="mut"></p>
+      <div id="dl"></div><p id="dm" class="mut" role="status" aria-live="polite"></p>
       <p class="mut">画像の差し替えは同じ名前で再登録。名前を直しても過去の記録は変わりません</p>
     </details>
     <div class="card"><h3>復元・共通候補</h3>
       <div style="position:relative"><div class="btn out">バックアップJSONから復元</div>
       <input type="file" id="bki" accept="application/json,.json" aria-label="バックアップJSONを選ぶ" style="position:absolute;left:0;top:0;width:100%;height:100%;opacity:0;font-size:16px"></div>
-      <p class="mut" style="margin:6px 0 0">サーバーにない記録と、新しい名前のアイコンだけを追加します(既存は上書きしません)</p>
-      <button class="btn out" id="plb" style="margin-top:8px">プレーヤー名の候補をサークル共通に保存</button><p id="bkm" class="mut"></p></div>
-    <div class="card"><h3>スクショで認識テスト・登録(予備)</h3>
+      <p class="mut" style="margin:6px 0 0">サーバーにない記録と、新しい名前のアイコン、足りない生徒名だけを追加します(既存は上書きしません)</p>
+      <button class="btn out" id="plb" style="margin-top:8px">プレーヤー名の候補をサークル共通に保存</button><p id="bkm" class="mut" role="status" aria-live="polite"></p></div>
+    <details class="card"><summary>スクショで認識テスト・登録(予備)</summary>
       <div style="position:relative"><div class="btn out">スクショを選ぶ</div>
       <input type="file" id="ish" accept="image/*" aria-label="アイコン登録用のスクショを選ぶ" style="position:absolute;left:0;top:0;width:100%;height:100%;opacity:0;font-size:16px"></div>
       <p class="mut" style="margin:6px 0 0">名前を入れた枠だけ登録します。登録済みの名前は「名前#2」の追加サンプルになります</p>
       <div class="ig" id="ig"></div><datalist id="adl"></datalist>
-      <button class="btn" id="ib" style="margin-top:10px" hidden>名前を入れた枠を登録</button><p id="im" class="mut"></p>
-    </div>
+      <button class="btn" id="ib" style="margin-top:10px" hidden>名前を入れた枠を登録</button><p id="im" class="mut" role="status" aria-live="polite"></p>
+    </details>
   </div>
-  <div class="card"><h3>バックアップ</h3><button class="btn out" id="bkj">全データをJSONで保存</button><button class="btn out" id="bkc" style="margin-top:8px">記録をCSVで保存</button><button class="btn out" id="nmc" style="margin-top:8px">相手名の自動入力の記憶を消す</button><p id="nmm" class="mut"></p></div>
+  <div class="card"><h3>バックアップ</h3><button class="btn out" id="bkj">全データをJSONで保存(復元は記録・アイコン・相手名・生徒リスト)</button><button class="btn out" id="bkc" style="margin-top:8px">記録をCSVで保存</button><button class="btn out" id="nmc" style="margin-top:8px">相手名の自動入力の記憶を消す</button><p id="nmm" class="mut" role="status" aria-live="polite"></p></div>
+  <p class="mut" id="vr" style="text-align:center"></p>
 </section>
 </div>
 
-<div id="ts" hidden></div>
+<div id="ts" role="status" aria-live="polite" hidden></div>
+<div id="dg" hidden><div class="dgc" role="alertdialog" aria-modal="true" aria-labelledby="dgm"><p id="dgm"></p><div class="dga"><button class="btn out" id="dgn">キャンセル</button><button class="btn" id="dgy">OK</button></div></div></div>
 <nav id="nv"><button class="on" data-t="in">記録</button><button data-t="hs">履歴</button><button data-t="st">設定</button></nav>
 
-<div id="sh" hidden><div class="sc" role="dialog" aria-modal="true">
+<div id="sh" hidden><div class="sc" role="dialog" aria-modal="true" aria-labelledby="sht" tabindex="-1">
   <div class="sht"><b id="sht"></b><button id="shx" aria-label="閉じる">×</button></div>
   <input id="sq" placeholder="生徒名を入力して絞り込み" autocomplete="off">
   <div class="chips" id="shb"><button class="chip" id="sok">入力した名前で決定</button><button class="chip" id="sem">空にする</button><button class="chip" id="sun">未使用も表示</button></div>
@@ -226,49 +235,92 @@ button,.chip,.rb{touch-action:manipulation}
 </div></div>
 
 <script>
+/* 略称の対応表(読み解き用)
+   S=アプリ状態(records/生徒リスト/しきい値)  F=入力中の記録(d=相手の防衛 a=自分の攻撃 o="D"なら防衛側)  H=履歴タブの絞り込み条件
+   Q=未送信キュー  CAL/CALF=認識の実績  NF=相手名の画像特徴  TPL=アイコン辞書  RZ/RT=攻守マーク辞書  HM=履歴の計算キャッシュ
+   VARS=1キャラが複数の記録名を持つ例外(モードチェンジ等)の定義表  LAYOUT=スクショ座標の設定(localStorage "bat-layout" で上書き可)
+   resetForm()=入力状態の初期化はここ1か所  ask()/say()=confirm/alertの代わり */
 const $=s=>document.querySelector(s);
-const hw=n=>String(n??"").replace(/[\uFF01-\uFF5E]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0)).replace(/\u3000/g," ").trim();
+const warn=(w,e)=>{try{console.warn("[tactics-log]",w,e)}catch(_){}};
+/* 握りつぶさない: コンソールに出し、画面にも通知する(同じ種類は15秒に1回まで) */
+const RPT={};
+const rep=(w,e)=>{warn(w,e);const n=Date.now();if(n-(RPT[w]||0)<15000)return;RPT[w]=n;try{toast(w+"でエラー: "+((e&&e.message)||e))}catch(_){}};
+addEventListener("error",e=>rep("画面処理",e.error||e.message));
+addEventListener("unhandledrejection",e=>rep("通信・保存",e.reason));
+/* confirm/alertの代わり(スタンドアロンPWAで抑止されるため)。Promiseで結果を返す */
+let DGR=null;
+function ask(msg,o){o=o||{};return new Promise(res=>{
+  if(DGR)DGR(false);
+  const d=$("#dg"),prev=document.activeElement,locked=$("#sh").hidden?[document.querySelector(".wrap"),$("#nv")]:[];
+  $("#dgm").textContent=msg;$("#dgn").hidden=!!o.alert;$("#dgy").textContent=o.ok||"OK";
+  locked.forEach(e=>e.inert=true);d.hidden=false;
+  DGR=v=>{d.hidden=true;DGR=null;locked.forEach(e=>e.inert=false);if(prev&&prev.isConnected&&prev.focus)try{prev.focus()}catch(_){}res(v)};
+  $("#dgy").focus();
+})}
+const say=m=>ask(m,{alert:true});
+$("#dgy").onclick=()=>DGR&&DGR(true);$("#dgn").onclick=()=>DGR&&DGR(false);
+$("#dg").onclick=e=>{if(e.target.id==="dg"&&DGR)DGR(false)};
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("#dg").hidden&&DGR)DGR(false)});
+const hw=n=>String(n??"").normalize("NFKC").replace(/\u3000/g," ").trim();
+const nz=s=>String(s??"").normalize("NFKC").toLowerCase().replace(/[\u3041-\u3096]/g,c=>String.fromCharCode(c.charCodeAt(0)+0x60));
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const NM=["STR1","STR2","STR3","STR4","SP1","SP2"],IDX=[0,1,2,3,4,5];
-const GR=["★3","★4","固1","固2","固3","固4"];
 /* ホシノ(臨戦): モードチェンジで1番・2番がある。記録では別名、絞り込みと集計では1つにまとめる。1番・2番の専用アイコンは表示専用で、スクショ読み取りには使わない */
-const HB="ホシノ(臨戦)",H1=HB+"1",H2=HB+"2",HD=new Set([H1,H2]);
-const grp=n=>HD.has(n)?HB:n;
-const isH=n=>hw(n)===HB;
-const hk=()=>{const t=TPL.find(x=>hw(x.base)===HB&&x.k);return t?t.k:"st"};
+const VARS=[{base:"ホシノ(臨戦)",vs:["ホシノ(臨戦)1","ホシノ(臨戦)2"]}];
+const VBASE=new Map(VARS.map(v=>[v.base,v.vs])),VMAP=new Map(VARS.flatMap(v=>v.vs.map(x=>[x,v.base])));
+const grp=n=>VMAP.get(n)||n;
+const isH=n=>VBASE.has(hw(n));
+const vkind=b=>{const t=TPL.find(x=>hw(x.base)===b&&x.k);return t?t.k:"st"};
 /* バックエンド(サークル共通)。同じ場所から配信するなら空のまま。別オリジンなら "https://example.com/api" のように書く */
-const API_BASE="https://tactics-log-db.kida-ken-1002.workers.dev";
+/* サーバーURLはHTMLに書かない。設定タブ(または #api=URL)で入力した値をこの端末に保存する(localStorage "bat-api") */
+let API_BASE="";try{const u=localStorage.getItem("bat-api");if(u)API_BASE=u.replace(/\/+$/,"")}catch(e){}
 /* 書き込み用キー。HTMLには書かず、設定タブで入力した値をこの端末に保存 */
 let KEY="";try{KEY=localStorage.getItem("bat-key")||""}catch(e){}
-if(location.hash.startsWith("#key=")){KEY=decodeURIComponent(location.hash.slice(5)).trim();try{localStorage.setItem("bat-key",KEY)}catch(e){}history.replaceState(null,"",location.pathname+location.search)}
-/* S: records/students/growth/th はサーバー由来。players/cont はこの端末だけの設定 */
-let S={records:[],st:[],sp:[],growth:GR.slice(),th:0.75,players:[],me:"",season:"",role:"",cpl:[],cont:false};
-const blank=()=>({n:"",me:"",r:"",s:"",o:"",d:Array(6).fill(""),g:{0:"",4:"",5:""},p:"",a:Array(6).fill(""),ga:{0:"",4:"",5:""},m:""});
+if(/^#(key|api)=/.test(location.hash)){
+  for(const kv of location.hash.slice(1).split("&")){const i=kv.indexOf("=");if(i<1)continue;let n=kv.slice(0,i),v=kv.slice(i+1);try{v=decodeURIComponent(v)}catch(e){}v=v.trim();
+    if(n==="key"&&v){KEY=v;try{localStorage.setItem("bat-key",KEY)}catch(e){}}
+    if(n==="api"&&/^https?:\/\//.test(v)){API_BASE=v.replace(/\/+$/,"");try{localStorage.setItem("bat-api",API_BASE)}catch(e){}}}
+  history.replaceState(null,"",location.pathname+location.search)}
+/* S: records/students/th はサーバー由来。players/cont はこの端末だけの設定 */
+let S={records:[],st:[],sp:[],th:0.75,players:[],me:"",role:"",cpl:[],cont:false};
+const blank=()=>({n:"",me:"",r:"",s:"",o:"",d:Array(6).fill(""),p:"",a:Array(6).fill(""),m:""});
 const pad=a=>Array.from({length:6},(_,i)=>(a&&a[i])||"");
-const normRec=r=>({...blank(),...r,d:pad(r.d),a:pad(r.a),g:{0:"",4:"",5:"",...(r.g||{})},ga:{0:"",4:"",5:"",...(r.ga||{})}});
-const GF=side=>side==="d"?"g":"ga";
-const fresh=()=>({...blank(),me:S.me,s:S.season||"",o:S.role||""});
+const normRec=r=>({...blank(),...r,d:pad(r.d),a:pad(r.a)});
+const fresh=()=>({...blank(),me:S.me,o:S.role||""});
+/* 記録の同一性: 日時・相手・勝敗・攻守・両編成(同時刻の別編成を同一視しない) */
+const rk=r=>[r.t,r.n,r.o||"",r.r||"",pad(r.d).join(","),pad(r.a).join(",")].join("|");
+/* 入力状態の初期化はここだけ */
+function resetForm(){F=fresh();MISS=new Set();CAND={};AMB=new Set();HQ=[];chain=false;CAL={};CALF=null;NF=null;editId=null}
 const byId=id=>S.records.find(r=>String(r.id)===String(id));
-let F=blank(),editId=null,cur=null,MISS=new Set(),chain=false,CAND={},AMB=new Set();
+let RV=0,HM={},CAL={},CALF=null,F=blank(),editId=null,cur=null,MISS=new Set(),chain=false,CAND={},AMB=new Set();
 
 /* 端末内の保存(プレーヤー名の候補・連続入力・キャッシュのみ) */
 const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){try{toast("端末の保存容量が不足しています(キャッシュを更新できません)")}catch(_){}return false}}};
-const saveLocal=()=>LS.set("bat-local",{players:S.players,me:S.me,season:S.season,role:S.role,ct:S.cont});
-const cacheSet=(k,v)=>{const c=LS.get("bat-cache",{});c[k]=v;LS.set("bat-cache",c)};
+const saveLocal=()=>LS.set("bat-local",{players:S.players,me:S.me,role:S.role,ct:S.cont});
+/* 大きいキャッシュ(記録・アイコン・サムネ)はIndexedDBへ。起動時にメモリへ読み込み、読み出しは同期、書き込みは裏で行う。localStorageに残っている旧データは初回に移して消す */
+const DBK={};let IDBP=null;
+const idb=()=>IDBP||(IDBP=new Promise((res,rej)=>{const r=indexedDB.open("tactics-log",1);r.onupgradeneeded=()=>r.result.createObjectStore("kv");r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}));
+const DBG=(k,d)=>DBK[k]===undefined?d:DBK[k];
+const DBS=(k,v)=>{DBK[k]=v;return idb().then(db=>new Promise((res,rej)=>{const t=db.transaction("kv","readwrite");t.objectStore("kv").put(v,k);t.oncomplete=res;t.onerror=()=>rej(t.error)}))};
+async function dbLoad(keys){
+  try{const db=await idb();await Promise.all(keys.map(k=>new Promise(res=>{const q=db.transaction("kv").objectStore("kv").get(k);q.onsuccess=()=>{if(q.result!==undefined)DBK[k]=q.result;res()};q.onerror=()=>res()})))}catch(e){rep("端末内データベース",e)}
+  for(const k of keys){if(DBK[k]!==undefined)continue;const v=LS.get(k,undefined);if(v===undefined)continue;DBK[k]=v;DBS(k,v).then(()=>{try{localStorage.removeItem(k)}catch(e){}},()=>{})}
+}
+const cacheSet=(k,v)=>{const c=DBG("bat-cache",{});c[k]=v;DBS("bat-cache",c).catch(e=>rep("キャッシュ保存",e))};
 const Q={get:()=>LS.get("bat-q",[]),set:v=>LS.set("bat-q",v)};
-const isNet=e=>e&&(e.name==="AbortError"||e instanceof TypeError);
-let flushing=false,SSU=null,LLT=0,ROLE=LS.get("bat-role",KEY?"admin":"");
+const isNet=e=>e&&(e.name==="AbortError"||(e instanceof TypeError&&/fetch|network|load failed|connection/i.test(e.message||"")));
+let flushing=false,SSU=null,LLT=0,ROLE=LS.get("bat-role","");
 
 /* サーバー通信 */
-async function api(method,path,body){
-  const c=new AbortController(),tm=setTimeout(()=>c.abort(),15000);
+async function api(method,path,body,ms){
+  const c=new AbortController(),tm=setTimeout(()=>c.abort(),ms||15000);
   try{
     const r=await fetch(API_BASE+path,{method,signal:c.signal,headers:{...(KEY?{"X-Key":KEY}:{}),...(body?{"Content-Type":"application/json"}:{})},body:body?JSON.stringify(body):undefined});
     if(r.status===401){
       const j=await r.json().catch(()=>null),w=j&&j.reason;
-      throw new Error(w==="no_secret"?"Workerに APP_KEY が設定されていません(Cloudflareで登録して、デプロイしてください)":w==="no_key"?"この端末にキーがありません":w==="mismatch"?"キーがWorkerの APP_KEY と一致しません":"キーが違います(Workerが古い可能性。最新のworker.jsをデプロイしてください)");
+      warn("auth",w);throw new Error(w==="no_key"?"この端末にキーがありません":w==="mismatch"?"キーが違います":"認証キーのエラーです(管理者に連絡してください)");
     }
-    if(r.status===409)throw new Error("他の端末で先に更新されています。再読込してから編集し直してください");
+    if(r.status===409)throw Object.assign(new Error("他の端末で先に更新されています。入力内容は残してあります"),{status:409});
     if(!r.ok)throw new Error("HTTP "+r.status);
     return r.status===204?null:await r.json().catch(()=>null);
   }finally{clearTimeout(tm)}
@@ -278,40 +330,49 @@ function applyConfig(c){
   const nm=a=>a.filter(x=>typeof x==="string"&&x);
   if(Array.isArray(c.students)){S.st=nm(c.students);S.sp=nm(c.students)}
   else if(c.students&&typeof c.students==="object"){if(Array.isArray(c.students.st))S.st=nm(c.students.st);if(Array.isArray(c.students.sp))S.sp=nm(c.students.sp)}
-  if(Array.isArray(c.growth)&&c.growth.length)S.growth=c.growth.filter(x=>typeof x==="string"&&x);
   if(Array.isArray(c.players))S.cpl=c.players.filter(x=>typeof x==="string"&&x);
   const th=parseFloat(c.th);if(Number.isFinite(th)&&th>0&&th<1)S.th=th;
+  {const v=cleanSeasons(c.seasons);if(v.length)setSeasons(v)}
 }
 function setRecords(v){
   const a=v&&!Array.isArray(v)?v.records:v;
   if(!Array.isArray(a))throw new Error("形式が違います");
-  S.records=a.map(normRec);cacheSet("records",S.records);
+  S.records=a.map(normRec);RV++;cacheSet("records",S.records);
 }
+function mergeRecs(a){
+  const m=new Map(S.records.map(x=>[String(x.id),x]));
+  for(const x of a)x.deleted?m.delete(String(x.id)):m.set(String(x.id),normRec(x));
+  bumpSince(a);
+  S.records=[...m.values()];RV++;cacheSet("records",S.records);
+}
+/* 削除された記録のuも拾う(拾わないと、最新の変更が削除のとき同期位置が進まない)。位置は戻さない */
+const bumpSince=ex=>{let mx=S.records.reduce((q,x)=>x.u&&x.u>q?x.u:q,"");for(const x of ex||[])if(x&&x.u&&x.u>mx)mx=x.u;if(mx&&mx>LS.get("bat-since",""))LS.set("bat-since",mx)};
+/* 差分同期の取りこぼし対策: 位置を10分巻き戻して取り直し(mergeはid単位で冪等)、24時間に1回は全件を取り直す */
+const FULL_MS=864e5,fullDue=()=>Date.now()-LS.get("bat-full-at",0)>FULL_MS;
+const sinceQ=s=>/^\d{4}-\d\d-\d\dT.*Z$/.test(s)?new Date(+new Date(s)-6e5).toISOString():s;
 async function loadRecords(){
   try{
     const sv=LS.get("bat-since","");
-    if(sv&&S.records.length){
-      const a=await api("GET","/records?since="+encodeURIComponent(sv));
+    if(sv&&S.records.length&&!fullDue()){
+      const a=await api("GET","/records?since="+encodeURIComponent(sinceQ(sv)));
       if(!Array.isArray(a))throw new Error("形式が違います");
-      const m=new Map(S.records.map(x=>[String(x.id),x]));
-      for(const x of a)x.deleted?m.delete(String(x.id)):m.set(String(x.id),normRec(x));
-      S.records=[...m.values()];cacheSet("records",S.records);
-    }else setRecords(await api("GET","/records"));
-    const mx=S.records.reduce((q,x)=>x.u&&x.u>q?x.u:q,"");if(mx)LS.set("bat-since",mx);
+      mergeRecs(a);
+    }else{setRecords(await api("GET","/records"));LS.set("bat-full-at",Date.now())}
+    bumpSince();
     LLT=Date.now();
-  }catch(e){return false}
+  }catch(e){warn("loadRecords",e);return false}
   return true;
 }
 let csBase="";
-const VER="v20";
-const drawCS=()=>{const n=Q.get().length;$("#cs").textContent=csBase+" ["+VER+"]"+(n?(csBase?" / ":"")+`未送信${n}件`:"")};
+const VER="v1";
+const drawCS=()=>{const n=Q.get().length;$("#cs").textContent=csBase+(n?(csBase?" / ":"")+`未送信${n}件`:"")};
 const setCS=t=>{csBase=t;drawCS()};
 async function flushQ(){
   const q=Q.get();if(!q.length||flushing)return;flushing=true;
   let i=0,ok=0;
   for(;i<q.length;i++){
     /* タイムアウト後に実は届いていた場合の二重登録を避ける */
-    if(!S.records.some(x=>x.t===q[i].t)){try{await api("POST","/records",q[i])}catch(e){break}}
+    if(!(q[i].cid?S.records.some(x=>x.id===q[i].cid||x.cid===q[i].cid):S.records.some(x=>rk(x)===rk(q[i])))){try{if(!q[i].cid&&crypto.randomUUID)q[i].cid=crypto.randomUUID();await api("POST","/records",q[i])}catch(e){warn("flushQ",e);break}}
     ok++;
   }
   Q.set(q.slice(i));flushing=false;
@@ -319,17 +380,25 @@ async function flushQ(){
   drawCS();
 }
 let syncing=false;
-async function syncAll(){
-  if(syncing)return;syncing=true;setCS("サーバーと同期中…");
-  const [c,i,r,me]=await Promise.allSettled([api("GET","/config"),api("GET","/icons"),api("GET","/records"),api("GET","/me")]);
-  if(me.status==="fulfilled"&&me.value)ROLE=me.value.role||"";else if(me.reason&&/404/.test(me.reason.message))ROLE=KEY?"admin":"";else if(me.reason&&/キー/.test(me.reason.message))ROLE="";
+async function syncAll(full,quick){
+  if(syncing)return;syncing=true;
+  try{await syncRun(full,quick)}catch(e){warn("sync",e);setCS("同期に失敗しました")}finally{syncing=false}
+}
+async function syncRun(full,quick){
+  setCS("サーバーと同期中…");
+  const sv=LS.get("bat-since",""),inc=!full&&sv&&S.records.length&&!fullDue();
+  const skipIc=!!(quick&&!full&&TPL.length&&Date.now()-LS.get("bat-icons-at",0)<6e5);
+  const [c,i,r,me]=await Promise.allSettled([api("GET","/config"),skipIc?Promise.resolve("skip"):api("GET","/icons",null,45000),api("GET","/records"+(inc?"?since="+encodeURIComponent(sinceQ(sv)):"")),api("GET","/me")]);
+  if(me.status==="fulfilled"&&me.value)ROLE=me.value.role||"";else if(me.reason&&/404/.test(me.reason.message))ROLE="";else if(me.reason&&/キー/.test(me.reason.message))ROLE="";
   LS.set("bat-role",ROLE);
+  const needKey=[c,i,r].some(x=>x.status==="rejected"&&x.reason&&/キー/.test(x.reason.message||""));
+  if(needKey)$("#kc").hidden=false;
   const errs=[];
   if(c.status==="fulfilled"&&c.value){applyConfig(c.value);cacheSet("config",c.value)}else errs.push("設定");
-  if(i.status==="fulfilled"){let j=i.value;if(j&&!Array.isArray(j))j=j.icons;if(Array.isArray(j)){rebuild(j);LS.set("bai-cache",j.map(x=>({n:x.n,k:x.k,d:x.d})))}else errs.push("アイコン")}else errs.push("アイコン");
-  if(r.status==="fulfilled"){try{setRecords(r.value)}catch(e){errs.push("記録")}}else errs.push("記録");
-  setCS(errs.length?`同期に失敗: ${errs.join("・")}(保存済みのデータを表示中。再読込できます)`:`同期済み: 記録${S.records.length}件・アイコン${TPL.length}件`);
-  syncing=false;drawForm();refreshDL();renderHist();applyMode();
+  if(i.status==="fulfilled"&&i.value==="skip"){}else if(i.status==="fulfilled"){let j=i.value;if(j&&!Array.isArray(j))j=j.icons;if(Array.isArray(j)){rebuild(j);LS.set("bat-icons-at",Date.now());DBS("bai-cache",j.map(x=>({n:x.n,k:x.k,d:x.d,th:x.th}))).catch(e=>rep("アイコン保存",e))}else errs.push("アイコン")}else errs.push("アイコン");
+  if(r.status==="fulfilled"){try{if(inc){if(!Array.isArray(r.value))throw 0;mergeRecs(r.value)}else{setRecords(r.value);LS.set("bat-full-at",Date.now())}bumpSince()}catch(e){errs.push("記録")}}else errs.push("記録");
+  setCS(errs.length?`同期に失敗: ${errs.join("・")}(保存済みのデータを表示中。再読込できます)${needKey?" 設定タブでキーを入力してください":""}`:`同期済み: 記録${S.records.length}件・アイコン${TPL.length}件${BADI?`(読めないアイコン${BADI}件)`:""}`);
+  drawForm();refreshDL();renderHist();applyMode();
 }
 
 /* アイコン照合の共通処理(特徴量: 各枠を16x16に区切ったRGB平均 = 768バイト) */
@@ -339,8 +408,19 @@ const gradF=f=>{const l=new Float32Array(256),g=[];
   for(let p=0;p<256;p++)l[p]=(f[p*3]+f[p*3+1]+f[p*3+2])/3;
   for(let y=0;y<15;y++)for(let x=0;x<15;x++){g.push(l[y*16+x+1]-l[y*16+x]);g.push(l[(y+1)*16+x]-l[y*16+x])}
   return g};
-const REF=1080,SX=[321,446,571,697,822,947,1383,1508,1633,1758,1884,2010],CY=866,CW=72,CHH=60,FN=16;
-function slotBox(W,H,i){const k=H/REF;return{x:Math.round(W/2+(SX[i]-1170)*k-CW*k/2),y:Math.round(CY*k-CHH*k/2),w:Math.round(CW*k),h:Math.round(CHH*k)}}
+/* スクショ読み取りの座標・閾値はここに集約(基準は高さ1080px・中心x=1170)。ゲーム画面が変わったら localStorage "bat-layout" にJSONで上書きできる */
+const LAYOUT_DEF={CX:1170,REF:1080,SX:[321,446,571,697,822,947,1383,1508,1633,1758,1884,2010],CY:866,CW:72,CHH:60,NMB:[1850,222,290,50],
+  J:{y:[250,330],l:[300,490],r:[1360,1550],min:300,ratio:3},RI:{l:237,r:1297,y:290},AR:2340/1080,ART:.08};
+const LAYOUT=(()=>{const o=LS.get("bat-layout",null);if(!o||typeof o!=="object"||Array.isArray(o))return LAYOUT_DEF;if(o.SX&&!(Array.isArray(o.SX)&&o.SX.length===12))return LAYOUT_DEF;return{...LAYOUT_DEF,...o}})();
+const {REF,SX,CY,CW,CHH}=LAYOUT,FN=16;
+/* 読み取り失敗時の診断文(想定と違う画面比率・読めた枠が少ない・攻守/勝敗の印が見つからない) */
+const layoutDiag=(im,ok,r,ro)=>{const ar=im.width/im.height,e=Math.abs(ar-LAYOUT.AR)/LAYOUT.AR;let t="";
+  if(e>LAYOUT.ART)t+=`画面比率が想定(${LAYOUT.AR.toFixed(2)})と違います(${im.width}×${im.height})。戦闘履歴の全体が写った画面ですか?`;
+  if(ok<=3)t+="読み取れた枠が少なすぎます。別の画面・切り抜き・ゲームの画面更新の可能性があります。";
+  if(!r&&ro==null)t+="勝敗と攻守の印も判別できませんでした(座標のずれの可能性)。";
+  return t};
+const sameChar=(a,b)=>!!a&&!!b&&a.split("(")[0]===b.split("(")[0];
+function slotBox(W,H,i){const k=H/REF;return{x:Math.round(W/2+(SX[i]-LAYOUT.CX)*k-CW*k/2),y:Math.round(CY*k-CHH*k/2),w:Math.round(CW*k),h:Math.round(CHH*k)}}
 function feat(im,b){
   const o=new Uint8Array(FN*FN*3);
   for(let gy=0;gy<FN;gy++)for(let gx=0;gx<FN;gx++){
@@ -357,24 +437,23 @@ function feat(im,b){
 }
 function norm(a){let m=0;for(const v of a)m+=v;m/=a.length;const z=Float32Array.from(a,v=>v-m);let s=0;for(const v of z)s+=v*v;s=Math.sqrt(s)||1;return z.map(v=>v/s)}
 const sim=(a,b)=>{let s=0;for(let i=0;i<a.length;i++)s+=a[i]*b[i];return s};
-function pink(im,xr,yr){const k=im.height/REF,cx=Math.round(im.width/2+(xr-1170)*k),cy=Math.round(yr*k);let r=0,b=0,n=0;for(let y=cy-10;y<=cy+10;y++)for(let x=cx-10;x<=cx+10;x++){const p=(Math.min(im.height-1,Math.max(0,y))*im.width+Math.min(im.width-1,Math.max(0,x)))*4;r+=im.data[p];b+=im.data[p+2];n++}return(r-b)/n}
 /* 勝敗: 左(自分)の「Win/Lose」文字。Winだけ金色なので、左右どちらに金色があるかで判定する */
 function judge(im){
-  const k=im.height/REF,cnt=(x0,x1)=>{let n=0;const xa=Math.round(im.width/2+(x0-1170)*k),xb=Math.round(im.width/2+(x1-1170)*k),ya=Math.round(250*k),yb=Math.round(330*k);
+  const k=im.height/REF,cnt=(x0,x1)=>{let n=0;const xa=Math.round(im.width/2+(x0-LAYOUT.CX)*k),xb=Math.round(im.width/2+(x1-LAYOUT.CX)*k),ya=Math.round(LAYOUT.J.y[0]*k),yb=Math.round(LAYOUT.J.y[1]*k);
     for(let y=ya;y<yb;y++)for(let x=xa;x<xb;x++){if(x<0||y<0||x>=im.width||y>=im.height)continue;const p=(y*im.width+x)*4;if(im.data[p]>200&&im.data[p+1]>150&&im.data[p+2]<110)n++}
     return n/(k*k)};
-  const L=cnt(300,490),R=cnt(1360,1550);
-  return L>300&&L>R*3?"WIN":R>300&&R>L*3?"LOSE":"";
+  const J=LAYOUT.J,L=cnt(J.l[0],J.l[1]),R=cnt(J.r[0],J.r[1]);
+  return L>J.min&&L>R*J.ratio?"WIN":R>J.min&&R>L*J.ratio?"LOSE":"";
 }
 /* 攻撃/防衛: 左(自分)の剣/盾マーク。剣=攻撃、盾=防衛。右(相手)は逆のマークが付く */
 const RT={"SW_L": "9/f19/f19/f19/f19/f19/f09/f19/f19/f19vf10drfl6i3sMLSzN7u4u767fP69/f19/f19/f19/f19/f19/b19vf19/f19vf18PP0m7C/+Pv95vD24+/48ff75e3z9/f19/f19/f19/f19/f19/b19vb19vb08/X0nrC75+3w/v798fb68PX7/v7+x9Pd9vb09vb09/f19vf19/f19vf19/f19vb2obG52uTo//7//Pz95u/36PD3/f7+uMbR9vb09vb09/f2rcPPydri9/f29/f1y9TZucXO/v7+/Pz85PD2yd7uyN7v0eTxqrnF9vb09vf03ubqMqbMMarRt9Ld5Ovuo7jD/f7+/Pz75O/2yN/vyN7uwtrqkqu7t8HF9vb09vb0l7rMKcT3Jsn9L6LSd5ex9vn6+/z75PD3yN7uyN7vutHlkKm0w8jK1tfV9vb09fb0xtTbQKnMJ8f7Jsj9WMju6Pb64ez2x97vxdzvnrTOn628xMbG39/d8vPw9vb09fXz29vYxdDWM5G/J8f5KMn7U7rsu9nvxdzvjqi9s77DxMTD5+fl9fXz9vb09vb09vb08vPyobTDOGSNMpG7JLnzGaTnTLDjdJe1wsbNzM3L7Ozq9fXz9/f19vb09vb09vf1n7TBRHCVSnCVOF6BJnqtHaPmGqTmKpXKrcHR7+/v9fXz9vb09/f19vb09/j3n7PCP2uORmqMRWqMPWGDLlh/I4bAG6ToGqPnKo/Jztzk9vf09vb09vb09vb0rb7PPWeMRWyNQGSFNlh6O2OKj6e9oLTEIonHHJvfLIe7vM7T9fXz9vb09/f19vb0q7vJQ2qQPmGDNll7M1mBiJ61y83NycrIqLfAkai4vcLF29zZ9PTy9vb09vb09vb01tfWqr7MO2WJMluAhJ+5zc/P6urn7u7s0tLQx8fG3t7c8fHv9vb09vb09vb09/f17Ozq0dLRpbTEm6y8zs/O6Ojm9fXz9vb08/Px8/Px9vb09vb09vb09vb09/f19vb0", "SH_R": "/uHX/uHX/eHY/+HX/uHX/eXd7urpaZemTI+xm628+uzn/eHZ/+HX/uHX/uHX/+HW/uHX9urn0tTZ+fDt5ebppbTEWYqhod/ro9zyY6zJbJGmzdHW8+zr8Ovp8+vo/uHY/eHYucLMWZ66VpuzabLGnNnl2Pb7+P7+yd/wvN/zlNLraKrKU5GyVpa4dJCn/ebd/eHYsL3Gk9bk9f79+v///f7+/v//7/z+ptbvx+Dzx97xxd/yxOH0m9n1XIih/ebe/eHYrrvFltTj/v7+7/r87v3+xfD6XdH2KbTrbMXvrNr0v9/zx9/xntr0Xomg/ebe/eHYrLrEmdXk///+p+T2K8f6Kcj8Jsn+HrHwHrHuIrDtP7Lpw+Dzntr0X4mg/ebe/eHYq7nDm9bl//7+ouT2Jsn/Jsr/Jsn+HrHwILDwH7HvO7Ttw+DyoNn0YIeh/ebe/eHXqLbAnNbl//7+n+P1Jsn/Jsr/J8j/HrHwILHwH7HvO7Ttw9/zn9r0Yomj/ube/eHYpbS+m9bm////neL1Jsr+Jsn/Jsn+HrHwH7HvILHvO7Ttw97zndrzYIii/ebe/eHYorK9ndjn//7/oOHzJ8n+Jcr/Jsn/HrHwH7DvILDvPLPswt/zn9r1XYmg/efe/eHXprW+jtDg9v7+8fz+gd35K8j7J8n+HrHwH7DvPbbundTyxt/xldfwZYmg/ebe/uDX7+blbZOjlt7m5Pz9+v7+uOz5PMn4IrHuWb7tuN30wODykNfsVpGn0dTZ/eHY/uDW99vS5tzcgJirb6/H1/j9+/39zPD6hc3vxOD0ttzzd8TeVYmg1NfZ79fR/uDW/uDW/uDW+NvS7NnVtbzEZp6xu/L28vz9x+LwpNnxYqbGiKS05t7c89jQ/d/W/uDW/uDW/uDW/uDW/N/V7dTL2tjZWImdk9vpjtPpUI2qtcDH6tXP+NvS/uDW/uDW/uDW/uDW/uDW/uDW/uHX/uDW9dnR59zZjqu2epyw1NXW79fQ/N7U/uDW/d/V/uDW/uDW", "SH_L": "9/f19/f19vb19/b19vf19/f1+Pn4lrC6VJ26Y4ih5urs9/f19vb09vb09/f09vf09/f1+Pj20Nfc8fb37/b4ws/aaYugfsDStej2gMjkVoqjrr3J5+zv9/r65Ojq9/f29/f1+fr5XpGsWJ20XaW8iMrYxPD48fz94O32w+DzpNnxeLnYXZy7T5GxTHqc7vHz9/f1+Pn5aaW45v7++P7+/P7//v7+/P//suDxweD2x9/xxt/xxuDztOD1TI6x6u7w9/f19/j6aKO37/7++/7+7vv92vb8ht/3KrrwS7rsm9T0vuD1w97yud7xTZGv6+/w9/f19/n6aKK38P7+8f//O8bzKsj7Jsn+Ibr0HrDvIrDuJ67rmdLvuN/xTpCv6+7w9/f1+Pr7aKK38f/+8P//Ncf3Jsn/Jsn+Ibv1ILHwH7HwIq/vmdPwut7xUI6w6+7w9/f19/n6ZqC38v/+7//+NMf2Jsn/Jcr+Ibr1ILHwILHwIrDvmdLwut/yTo+w6+7w9/f19/n6Yp638v/+7//+M8b2Jsn/Jsn/Ibv1H7HwH7HwIrDvmNLxud7xTY+v6+7w9/f1+Pr6YJ638//+7///NcX1Jcr+Jsn/Ibv1H7DwH7HvI6/umNHvut7xTZGv6+/w9vb0+Pr5X5yy4v3+/f7/sOv6O8v4J8n+Ibv2HrDwKbHtd8jwwt7ysN7wTY2r6+/w9vb09PXzmq+6bbXCyfb6+v7+4/r9XNH2I7r0N7PsoNX0xt7xqt3xYKrAjaWz9vb09vb09fXz7Ozrsb3JXZCptenz9/7+7Pv9hNDwtN32w97yk9TuUJmxpbnD6ero9PTy9vb09/f19PTy6uro1djbc5qtk9Xf5vz83e31tt7yd73dZZOrxdHW6eno9PTy9vb09vb09vb09vb09vb07u/s6erpiqSybbXIqef1YqrHgZ6v5+no6uro9fXz9vb09vb09vb09vb09vb09vb09vb08/Lw6OnorsHHdZyyqLzE6ero8fHv9vb09vb09vb09vb0", "SW_R": "/+HX/+HX/+HX/+HX/+DX/+DW/+HX/uDW/uDW/OTcrrnDqLfEus3d1uf15fD4v8rW/+HX/+HX/+HX/+HX/+HX/+HX/uHX/uHW/eLZ0dTYtMTP8fb54/D35PD4+fz9s8LM/+HX/+HX/uHX/+HX/+HW/+HX/uHX/uHY3dnaobK+/P7+/P3+6vL59/r8/v7+rb3K/uHW/+DX/uHY/ePb/uHX/+HX/uHX7eHelamy+v3+/v79+Pv83en08vf7/v7+rb7M/uHX/uHY7+Phm7XD8Ojn/uHY/OXfo6+58PT3/v79+Pv81OXxyN7vyN/v1+bwrrfB/uHX/eLZob3MLLzmVKTB4+Dju8TOydXb/f39+Pv71ubyyN/uyN/vscral6m00sfE/uDW+uTeVqbKJsr9JsT5RJS9qr3N/f39+Pv80+XxyN7vx97vobvMorK5xray7NDI/uDW9tzVmbvKLLfiJcn+KsT3mdrw9Pr80uPxxt3vvtTplanBtba9zbmz8NPL/d/V/uDW+NvS0sC7k7THJajcJ8r8LsT4esLrxdzuuM/kjKS0wbm4176399nQ/uDV/uDW/uDW/eHX6eHfZoWhNWePL63dHa3sHKLjcbHYkKW9yLu548jB+NvS/uDW/uDW/uDW/eLY8ebkboykR3CVR22QL16EIpDNG6ToHKLhUprC1M3S+d3U/d/V/uHW/uDW/uDW7OXlYYWeQmqNSW2PQGWHO12ALGOPHZXXGqToG6DkVpjB+Ojl/uDW/uDW/uDW/uDWZ4elQmqNQ2qLOVt+Ol2ARWyQv8nUa5e4HJndHZLUTY+28eTc/uDW/uDW/+HX/uDWaoajRWuQOl1+NFh7PGOLtrzHzLiyy767kqa3pKy1zL6779TL/uDW/uDW/uDW/uDW19LRbY6qNl+DP2iOuMPP2cO999rS7tHKz7au1Lu07tHJ/d7V/uDW/uDW/uDW/uDW5cvE0MbHkKG0vsDF2cK899rQ/uDW/d/W+tzT+93U/uDW/uDW/uHX/uDW/uDW/uDW"};
 let RZ=null;
-const iconBox=(im,xr,yr)=>{const k=im.height/REF,w=70*k,h=70*k;return{x:Math.round(im.width/2+(xr-1170)*k-w/2),y:Math.round(yr*k-h/2),w:Math.round(w),h:Math.round(h)}};
+const iconBox=(im,xr,yr)=>{const k=im.height/REF,w=70*k,h=70*k;return{x:Math.round(im.width/2+(xr-LAYOUT.CX)*k-w/2),y:Math.round(yr*k-h/2),w:Math.round(w),h:Math.round(h)}};
 function roleOf(im){
   if(!RZ){RZ={};for(const[k,v]of Object.entries(RT))RZ[k]=norm(unb64(v))}
   let a=-9,d=-9;
   for(const[dx,dy]of SH){
-    const bl=iconBox(im,237,290),br=iconBox(im,1297,290);
+    const bl=iconBox(im,LAYOUT.RI.l,LAYOUT.RI.y),br=iconBox(im,LAYOUT.RI.r,LAYOUT.RI.y);
     const zl=norm(feat(im,{...bl,x:bl.x+dx,y:bl.y+dy})),zr=norm(feat(im,{...br,x:br.x+dx,y:br.y+dy}));
     a=Math.max(a,sim(zl,RZ.SW_L)+sim(zr,RZ.SH_R));d=Math.max(d,sim(zl,RZ.SH_L)+sim(zr,RZ.SW_R));
   }
@@ -382,12 +461,13 @@ function roleOf(im){
 }
 
 /* アイコン辞書(サーバー由来) */
-let TPL=[];
+let TPL=[],TMN=new Map(),TMB=new Map();
 const unb64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+let BADI=0;
 function rebuild(list){
-  const t=[],TH=LS.get("bat-thumbs",{});
-  for(const x of list||[]){try{if(!x||!x.n||!x.d)continue;const f=unb64(x.d);if(f.length!==FN*FN*3)continue;t.push({th:x.th||TH[x.n]||"",n:x.n,base:x.n.replace(/#\d+$/,""),z:norm(f),g:norm(gradF(f)),k:x.k,f,d:x.d})}catch(e){}}
-  TPL=t;
+  BADI=0;const t=[],TH=DBG("bat-thumbs",{});
+  for(const x of list||[]){try{if(!x||!x.n)continue;if(!x.d){BADI++;continue}const f=unb64(x.d);if(f.length!==FN*FN*3){BADI++;continue}t.push({th:x.th||TH[x.n]||"",n:x.n,base:x.n.replace(/#\d+$/,""),z:norm(f),g:norm(gradF(f)),k:x.k,f,d:x.d})}catch(e){BADI++;warn("icon "+(x&&x.n),e)}}
+  TPL=t;TMN=new Map();TMB=new Map();for(const x of t){TMN.set(x.n,x);if(!TMB.has(x.base))TMB.set(x.base,x)}
 }
 
 /* 候補の集計 */
@@ -397,14 +477,22 @@ const kindList=k=>{
   const own=[...(k==="st"?S.st:S.sp),...TPL.filter(t=>t.k===k).map(t=>t.base)];
   const other=new Set([...(k==="st"?S.sp:S.st),...TPL.filter(t=>t.k===o).map(t=>t.base)]);
   const fromRec=S.records.flatMap(r=>idx.flatMap(i=>[r.d[i],r.a[i]])).filter(x=>x&&!other.has(x));
-  let r=[...new Set([...own,...fromRec].filter(Boolean))].filter(x=>hw(x)!==HB&&!HD.has(x));
-  if(k===hk())r=[H1,H2,...r];
+  let r=[...new Set([...own,...fromRec].filter(Boolean))].filter(x=>!VBASE.has(hw(x))&&!VMAP.has(x));
+  for(const[b,vs]of VBASE)if(k===vkind(b))r=[...vs,...r];
   return r;
 };
-const allPlayers=()=>[...new Set([...S.cpl,...S.players,...S.records.flatMap(r=>[r.n,r.me]).filter(Boolean)])];
+const allPlayers=()=>{const c={};for(const r of S.records)if(r.n){const k=hw(r.n);c[k]=(c[k]||0)+1}return[...new Set([...S.cpl,...S.players,...S.records.flatMap(r=>[r.n,r.me]).filter(Boolean)].map(hw).filter(Boolean))].sort((a,b)=>(c[b]||0)-(c[a]||0))};
 /* シーズン開始日(新しい順)。次のシーズンの開始日が決まったら先頭に1行足してください。表より前の期間は BASE_SEASON 扱い。記録に s が入っていればそれを優先 */
-const SEASONS=[{n:12,from:"2026-11-11T00:00:00+09:00"}],BASE_SEASON=11;
-const seasonOf=t=>{const ms=+new Date(t);if(!ms)return"";for(const x of SEASONS)if(ms>=+new Date(x.from))return"S"+x.n;return"S"+BASE_SEASON};
+/* 新しい記録は保存時に s(シーズン)を確定して書き込む。以降この表を直しても過去の記録は動かない。
+   RESET_H: ゲームの日替わり時刻(時)。「今日」と日付見出しの区切りに使う。0時区切りにしたいなら0 */
+let SEASONS=[{n:12,from:"2026-11-11T00:00:00+09:00"}],SCUST=false;const BASE_SEASON=11,RESET_H=4;
+/* 管理画面で設定したシーズン表(サーバーのconfig.seasons、無ければこの端末のbat-seasons)が既定より優先。
+   表の最古より前は「最古の番号-1」扱い */
+const cleanSeasons=a=>(Array.isArray(a)?a:[]).filter(x=>x&&Number.isFinite(+x.n)&&+x.n>0&&!isNaN(+new Date(x.from))).map(x=>({n:Math.trunc(+x.n),from:String(x.from)}));
+const setSeasons=v=>{SEASONS=v.slice().sort((a,b)=>+new Date(b.from)-+new Date(a.from));SCUST=true};
+const baseS=()=>SEASONS.length?Math.min(...SEASONS.map(x=>x.n))-1:BASE_SEASON;
+const sOut=()=>SCUST?{seasons:SEASONS}:{};
+const seasonOf=t=>{const ms=+new Date(t);if(!ms)return"";for(const x of SEASONS)if(ms>=+new Date(x.from))return"S"+x.n;return"S"+baseS()};
 const rSeason=r=>{const v=String(r.s||"").trim();return v?(/^\d+$/.test(v)?"S"+v:v):seasonOf(r.t)};
 const seasons=()=>[...new Set([...S.records.map(rSeason),seasonOf(Date.now())].filter(Boolean))].sort((a,b)=>(parseInt(b.slice(1))||0)-(parseInt(a.slice(1))||0));
 const refreshDL=()=>{$("#pls").innerHTML=allPlayers().map(x=>`<option value="${esc(x)}">`).join("")};
@@ -419,7 +507,7 @@ const TU=new Map();
 const tu=s=>{if(!s||s.slice(0,5)!=="data:")return s;let u=TU.get(s);if(!u){try{const i=s.indexOf(","),b=atob(s.slice(i+1)),a=new Uint8Array(b.length);for(let j=0;j<b.length;j++)a[j]=b.charCodeAt(j);u=URL.createObjectURL(new Blob([a],{type:s.slice(5,s.indexOf(";"))}))}catch(e){u=s}TU.set(s,u)}return u};
 function iconTh(n){
   if(!n)return"";
-  const t=TPL.find(x=>x.n===n)||TPL.find(x=>x.base===n)||(HD.has(n)?TPL.find(x=>x.base===HB):null);
+  const t=TMN.get(n)||TMB.get(n)||(VMAP.has(n)?TMB.get(VMAP.get(n)):null);
   if(!t)return"";
   if(t.th)return tu(t.th);
   if(!t.t2){const c=document.createElement("canvas");c.width=16;c.height=16;const x=c.getContext("2d"),id=x.createImageData(16,16);for(let p=0;p<256;p++){id.data[p*4]=t.f[p*3];id.data[p*4+1]=t.f[p*3+1];id.data[p*4+2]=t.f[p*3+2];id.data[p*4+3]=255}x.putImageData(id,0,0);t.t2=c.toDataURL()}
@@ -428,13 +516,11 @@ function iconTh(n){
 const iconImg=n=>{const s=iconTh(n);return s?`<img src="${esc(s)}" alt="">`:""};
 const tile=(n,l)=>`<div class="tl"><span class="sq">${iconImg(n)}<span class="pos">${l}</span>${n?"":"－"}</span><span class="nm">${esc(n)||"　"}</span></div>`;
 const slot=(side,i)=>{const nm=F[side][i],sd=F.o==="D"?(side==="d"?"相手の攻撃":"自分の防衛"):(side==="d"?"防衛":"攻撃"),miss=(MISS.has(side+i)&&!nm)||(AMB.has(side+i)&&!!nm);
-  return `<div class="sl"><button class="slot${nm?"":" emp"}${miss?" miss":""}" data-s="${side}${i}" aria-label="${sd} ${NM[i]} ${esc(nm)||"空"}${miss?"(未認識)":""}"><span class="sq">${iconImg(nm)}<span class="pos">${NM[i]}</span>${nm?"":"＋"}</span><span class="nm">${esc(nm)||"　"}</span></button></div>`};
+  return `<div class="sl"><button class="slot${nm?"":" emp"}${miss?" miss":""}" data-s="${side}${i}" aria-label="${sd} ${NM[i]} ${esc(nm)||"空"}${miss?(nm?"(要確認)":"(未認識)"):""}"><span class="sq">${iconImg(nm)}<span class="pos">${NM[i]}</span>${miss?`<span class="flag">${nm?"要確認":"未認識"}</span>`:""}${nm?"":"＋"}</span><span class="nm">${esc(nm)||"　"}</span></button></div>`};
 const nameSel=(k,label)=>{const v=F[k]||"",l=allPlayers();if(v&&!l.includes(v))l.push(v);
   return `<label>${label}</label><select data-nk="${k}"><option value="">未選択</option>${l.map(x=>`<option${x===v?" selected":""}>${esc(x)}</option>`).join("")}<option value="__new">新しい名前を追加</option></select><input data-nn="${k}" placeholder="新しい名前を入力して確定" hidden>`};
 function drawNames(){$("#pn").innerHTML=nameSel("me","自分の名前")+nameSel("n","相手の名前")}
 $("#in").addEventListener("change",e=>{
-  const g=e.target.closest("[data-g]");
-  if(g){F[GF(g.dataset.g[0])][+g.dataset.g[1]]=g.value;return}
   const s=e.target.closest("[data-nk]");
   if(s){if(s.value==="__new"){const i=$(`[data-nn="${s.dataset.nk}"]`);i.hidden=false;i.focus()}else{F[s.dataset.nk]=s.value;if(s.dataset.nk==="me"&&editId==null){S.me=s.value;saveLocal()}}return}
   const t=e.target.closest("[data-nn]");
@@ -465,69 +551,78 @@ function openSheet(side,i){
   $("#sq").value="";drawSheet();$("#sh").hidden=false;if(matchMedia("(hover:hover)").matches)setTimeout(()=>$("#sq").focus(),60);
 }
 let SHOWALL=false,HQ=[];
-const prow=(x,cls,n)=>`<button class="pr${cls}" data-p="${esc(x)}"><span class="ic">${iconImg(x)}</span><span>${esc(x)}</span></button>`;
+const prow=(x,cls,n)=>`<button class="pr${cls}" data-p="${esc(x)}"><span class="ic">${iconImg(x)}</span><span>${esc(x)}</span>${cls?`<span class="mut" style="margin-left:auto">候補</span>`:""}</button>`;
 function drawSheet(){
-  if(cur.mode==="h"){$("#sl").innerHTML=[H1,H2].map(x=>prow(x,"",0)).join("");return}
-  const q=$("#sq").value.trim().toLowerCase(),kind=cur.i<4?"st":"sp",idx=kind==="st"?[0,1,2,3]:[4,5];
+  if(cur.mode==="h"){$("#sl").innerHTML=(VBASE.get(cur.base)||[]).map(x=>prow(x,"",0)).join("");return}
+  const q=nz($("#sq").value.trim()),kind=cur.i<4?"st":"sp",idx=kind==="st"?[0,1,2,3]:[4,5];
   const ua=usage("a",idx),ud=usage("d",idx),c=cur.side==="a"?ua:ud,cd=(!q&&cur.side!=="f"&&CAND[cur.side+cur.i])||[];
-  const cnt=x=>x===HB&&cur.side==="f"?(c[H1]||0)+(c[H2]||0)+(c[HB]||0):(c[x]||0);
+  const cnt=x=>VBASE.has(x)&&cur.side==="f"?VBASE.get(x).reduce((s,v)=>s+(c[v]||0),c[x]||0):(c[x]||0);
   let l=kindList(kind);
-  if(cur.side==="f"){l=l.filter(x=>!HD.has(x));if(kind===hk())l.unshift(HB)}
-  l=l.filter(x=>!q||x.toLowerCase().includes(q));
+  if(cur.side==="f"){l=l.filter(x=>!VMAP.has(x));for(const b of VBASE.keys())if(kind===vkind(b))l.unshift(b)}
+  l=l.filter(x=>!q||nz(x).includes(q));
   /* 記録に一度も出ていない生徒は、初期表示から外す(辞書には残る)。検索するか「未使用も表示」で出せる */
-  if(!q&&!SHOWALL&&S.records.length)l=l.filter(x=>(ua[x]||0)+(ud[x]||0)>0||HD.has(x)||(x===HB&&cur.side==="f")||cd.includes(x));
+  if(!q&&!SHOWALL&&S.records.length)l=l.filter(x=>(ua[x]||0)+(ud[x]||0)>0||VMAP.has(x)||(VBASE.has(x)&&cur.side==="f")||cd.includes(x));
   l=l.sort((a,b)=>cnt(b)-cnt(a)).slice(0,80);
   $("#sun").hidden=!S.records.length;$("#sun").textContent=SHOWALL?"使用中だけ表示":"未使用も表示";
   $("#sl").innerHTML=[...cd,...l.filter(x=>!cd.includes(x))].map(x=>prow(x,cd.includes(x)?" warn":"",cnt(x))).join("")||`<span class="mut">候補なし。上のボタンで入力した名前を使えます</span>`;
 }
 function askH(side,i){
-  cur={side,i,mode:"h"};
-  $("#sht").textContent=`${HB}は1番?2番?(${side==="d"?"相手の防衛 ":"自分の攻撃 "}${NM[i]})`;
+  const base=F[side][i];cur={side,i,mode:"h",base};
+  $("#sht").textContent=`${base}はどのモード?(${side==="d"?"相手の防衛 ":"自分の攻撃 "}${NM[i]})`;
   $("#sq").hidden=true;$("#shb").hidden=true;drawSheet();$("#sh").hidden=false;
 }
 function pick(x){
   if(cur.side==="f"){H.fd[cur.i]=x;H.lim=30;$("#sh").hidden=true;renderHist();return}
-  if(isH(x)){const k=cur.side+cur.i;F[cur.side][cur.i]=HB;AMB.add(k);MISS.delete(k);drawForm();askH(cur.side,cur.i);return}
+  if(isH(x)){const k=cur.side+cur.i;F[cur.side][cur.i]=hw(x);AMB.add(k);MISS.delete(k);drawForm();askH(cur.side,cur.i);return}
   F[cur.side][cur.i]=x;MISS.delete(cur.side+cur.i);AMB.delete(cur.side+cur.i);$("#sh").hidden=true;drawForm();
   if(HQ.length){const k=HQ.shift();askH(k[0],+k[1]);return}
   if(chain){const k=[...MISS][0];if(k)openSheet(k[0],+k[1]);else chain=false}
 }
 async function saveRec(){
   if(!F.n&&!F.d.some(Boolean)&&!F.a.some(Boolean)){$("#msg").textContent="何か入力してください";return}
-  if(editId==null&&!F.r&&!confirm("勝敗が未選択です。このまま保存しますか?"))return;
+  const calRows=[];if(editId==null&&CALF===F)for(const[k,c]of Object.entries(CAL)){const v=F[k[0]][+k[1]];calRows.push({s:+c.s.toFixed(3),m:+c.m.toFixed(3),ok:!!v&&grp(v)===grp(c.n)})}
+  const was=editId!=null,rec=JSON.parse(JSON.stringify(F));delete rec.id;const t0=rec.t0;delete rec.t0;
+  /* 確認は1回にまとめる */
+  const iss=[];
+  if(!was&&!F.r)iss.push("勝敗が未選択です");
   const dp=a=>{const q=a.filter(Boolean).map(grp);return q.length!==new Set(q).size};
-  if((dp(F.d)||dp(F.a))&&!confirm("同じ生徒が重複する編成があります。このまま保存しますか?"))return;
-  const was=editId!=null,rec=JSON.parse(JSON.stringify(F));delete rec.id;
-  if(!was){const sg=x=>JSON.stringify([x.n,x.r,x.d,x.a,x.o]),k=sg(rec);
-    if(S.records.some(x=>Date.now()-(+new Date(x.t)||0)<6e5&&sg(x)===k)&&!confirm("10分以内に同じ内容の記録があります。重複かもしれません。それでも保存しますか?"))return}
+  if(dp(F.d)||dp(F.a))iss.push("同じ生徒が重複する編成があります");
+  const emp=[...F.a,...F.d].filter(x=>!x).length,amb=AMB.size;
+  if(emp)iss.push(`空の枠が${emp}つ`);
+  if(amb)iss.push(`要確認(黄色)の枠が${amb}つ`);
+  if(!was){const sg=x=>JSON.stringify([x.n,x.r,x.d,x.a,x.o]),k=sg(rec),tn=t0?+new Date(t0):Date.now();
+    if(S.records.some(x=>Math.abs(tn-(+new Date(x.t)||0))<6e5&&sg(x)===k))iss.push("10分以内に同じ内容の記録があります(重複の可能性)")}
+  if(iss.length&&!await ask(iss.join("\n")+"\n\nこのまま保存しますか?"))return;
   const btn=$("#sv");btn.disabled=true;$("#msg").textContent="保存中…";let queued=false;
   try{
-    if(was){const old=byId(editId);rec.t=(old&&old.t)||new Date().toISOString();await api("PUT","/records/"+encodeURIComponent(editId),rec)}
-    else{rec.t=new Date().toISOString();rec.cid=crypto.randomUUID?crypto.randomUUID():undefined;await api("POST","/records",rec)}
-  }catch(e){if(!was&&isNet(e)){Q.set([...Q.get(),rec]);queued=true;drawCS()}else{$("#msg").textContent="保存に失敗しました(入力は残してあります): "+(e&&e.message||"");btn.disabled=false;return}}
+    if(was){const old=byId(editId);rec.t=(old&&old.t)||new Date().toISOString();if(!rec.s)rec.s=seasonOf(rec.t).slice(1);await api("PUT","/records/"+encodeURIComponent(editId),rec)}
+    else{rec.t=t0?new Date(t0).toISOString():new Date().toISOString();rec.cid=crypto.randomUUID?crypto.randomUUID():undefined;if(!rec.s)rec.s=seasonOf(rec.t).slice(1);await api("POST","/records",rec)}
+  }catch(e){if(e&&e.status===409){btn.disabled=false;await loadRecords();const nw=byId(editId);if(nw&&nw.u)F.u=nw.u;refreshDL();renderHist();$("#msg").textContent="他の端末で先に更新されていたため、最新を読み込み直しました。入力内容は残してあります。内容を確認して、もう一度「保存」を押すとこの内容で上書きします";return}if(!was&&isNet(e)){if(!Q.set([...Q.get(),rec])){$("#msg").textContent="通信できず、端末にも保存できませんでした(入力は残してあります)";btn.disabled=false;return}queued=true;drawCS()}else{$("#msg").textContent="保存に失敗しました(入力は残してあります): "+(e&&e.message||"");btn.disabled=false;return}}
   btn.disabled=false;
+  if(calRows.length){LS.set("bat-cal",LS.get("bat-cal",[]).concat(calRows).slice(-600));CAL={};CALF=null}
   learn(rec);if(!was)learnName(rec);NF=null;
-  const a=F.a.slice(),ga={...F.ga};F=fresh();MISS=new Set();CAND={};AMB=new Set();editId=null;
-  if(!was&&S.cont){F.a=a;F.ga=ga}
+  const a=F.a.slice();resetForm();
+  if(!was&&S.cont){F.a=a}
   await loadRecords();
-  let warn="";if(!queued&&rec.o==="D"){const sv=S.records.find(x=>x.t===rec.t);if(sv&&sv.o!=="D")warn="【注意】サーバーが防衛の印を保存しませんでした。Workerの更新が必要です"}
+  let wmsg="";if(!queued&&rec.o==="D"&&ROLE==="admin"){const sv=S.records.find(x=>rec.cid?(x.id===rec.cid||x.cid===rec.cid):x.t===rec.t);if(sv&&sv.o!=="D")wmsg="【注意】サーバーが防衛の印を保存しませんでした。Workerの更新が必要です"}
   drawForm();refreshDL();renderHist();
   $("#msg").textContent=queued?"通信できないため端末に一時保存しました。接続したら自動で送信します":was?"更新しました":"保存しました";
-  if(warn)$("#msg").textContent+=" "+warn;
+  if(wmsg)$("#msg").textContent+=" "+wmsg;
   if(!was&&PQ.length)await nextShot();
 }
 function startEdit(id){
   const r=byId(id);if(!r)return;
-  NF=null;F=Object.assign(blank(),JSON.parse(JSON.stringify(r)));editId=r.id;MISS=new Set();CAND={};AMB=new Set();
+  resetForm();F=Object.assign(blank(),JSON.parse(JSON.stringify(r)));editId=r.id;
   drawForm();tab("in");window.scrollTo(0,0);
 }
 
 /* 相手の名前の自動入力: 名前部分の画像を、手入力した名前と一緒にこの端末に覚えて照合する */
-const NMB=[1850,222,290,50],NGX=96,NGY=16,NTH=0.85;
+const NMB=LAYOUT.NMB,NGX=96,NGY=16,NTH=0.92,NMG=0.03;
+const NZ=new WeakMap(),nameZ=t=>{let z=NZ.get(t);if(!z){z=norm(unb64(t.d));NZ.set(t,z)}return z};
 let NAMES=LS.get("bat-names",[]);if(!Array.isArray(NAMES))NAMES=[];
 let NF=null;
 function nameFeat(im,dx,dy){
-  const k=im.height/REF,bx=Math.round(im.width/2+(NMB[0]-1170)*k)+dx,by=Math.round(NMB[1]*k)+dy,bw=Math.round(NMB[2]*k),bh=Math.round(NMB[3]*k);
+  const k=im.height/REF,bx=Math.round(im.width/2+(NMB[0]-LAYOUT.CX)*k)+dx,by=Math.round(NMB[1]*k)+dy,bw=Math.round(NMB[2]*k),bh=Math.round(NMB[3]*k);
   const o=new Uint8Array(NGX*NGY);
   for(let gy=0;gy<NGY;gy++)for(let gx=0;gx<NGX;gx++){
     const x0=bx+Math.floor(gx*bw/NGX),y0=by+Math.floor(gy*bh/NGY),x1=Math.max(bx+Math.floor((gx+1)*bw/NGX),x0+1),y1=Math.max(by+Math.floor((gy+1)*bh/NGY),y0+1);
@@ -540,10 +635,13 @@ function nameFeat(im,dx,dy){
 function nameMatch(im){
   if(!NAMES.length)return null;
   try{
-    const zs=SH.map(([dx,dy])=>norm(nameFeat(im,dx,dy)));let best=null;
-    for(const t of NAMES){const z=norm(unb64(t.d));let s=-1;for(const q of zs){const v=sim(q,z);if(v>s)s=v}if(!best||s>best.s)best={n:t.n,s}}
-    return best&&best.s>=NTH?best:null;
-  }catch(e){return null}
+    const zs=SH.map(([dx,dy])=>norm(nameFeat(im,dx,dy))),by=new Map();
+    for(const t of NAMES){const z=nameZ(t);let s=-1;for(const q of zs){const v=sim(q,z);if(v>s)s=v}if(!by.has(t.n)||s>by.get(t.n))by.set(t.n,s)}
+    const l=[...by.entries()].sort((a,b)=>b[1]-a[1]);
+    /* 閾値未満、または2位の別名と僅差なら自動入力しない */
+    if(!l.length||l[0][1]<NTH||(l[1]&&l[0][1]-l[1][1]<NMG))return null;
+    return{n:l[0][0],s:l[0][1]};
+  }catch(e){warn("nameMatch",e);return null}
 }
 function learnName(rec){
   if(!NF||!rec.n){NF=null;return}
@@ -554,15 +652,20 @@ function learnName(rec){
 }
 /* スクショ読み取り(アイコン照合。AIは使わない) */
 async function imgData(f){const b=await createImageBitmap(f),c=document.createElement("canvas");c.width=b.width;c.height=b.height;const x=c.getContext("2d",{willReadFrequently:true});x.drawImage(b,0,0);const d=x.getImageData(0,0,b.width,b.height);b.close&&b.close();return d}
-async function matchAll(im){
-  const th=S.th,LOW=0.5,MG=0.1,sc=[];
+async function matchAll(im,TP){
+  const TD=TP||TPL,th=S.th,LOW=0.55,MG=0.1,PRE=40,sc=[];
   for(let i=0;i<SX.length;i++){await new Promise(r=>setTimeout(r));
     const b=slotBox(im.width,im.height,i),kd=(i%6)<4?"st":"sp",zs=[];
     for(const dy of SH4)for(const dx of SH4){const f=feat(im,{...b,x:b.x+dx,y:b.y+dy});zs.push([norm(f),norm(gradF(f))])}
-    const bm={};
-    for(const t of TPL){
-      if(t.k&&t.k!==kd)continue;if(HD.has(hw(t.base)))continue;
-      let s=-1;for(const[z,g]of zs){const v=0.7*sim(z,t.z)+0.3*sim(g,t.g);if(v>s)s=v}
+    /* 先に中心位置だけで全辞書を粗く採点し、上位PRE件だけ25通りのずれで精査する(約10倍速い) */
+    const bm={},pre=[],c0=zs[12];
+    for(const t of TD){
+      if(t.k&&t.k!==kd)continue;if(VMAP.has(hw(t.base)))continue;
+      pre.push([t,0.7*sim(c0[0],t.z)+0.3*sim(c0[1],t.g)]);
+    }
+    pre.sort((a,b)=>b[1]-a[1]);
+    for(const[t,v0]of pre.slice(0,PRE)){
+      let s=v0;for(const[z,g]of zs){const v=0.7*sim(z,t.z)+0.3*sim(g,t.g);if(v>s)s=v}
       if(!(t.base in bm)||s>bm[t.base])bm[t.base]=s;
     }
     sc[i]=Object.entries(bm).map(([n,s])=>({n,s})).sort((a,b)=>b.s-a.s);
@@ -586,7 +689,7 @@ let PQ=[],PN=0;
 async function recog(){
   const fs=[...$("#shot").files],st=$("#rst");$("#shot").value="";if(!fs.length)return;
   if(!TPL.length){st.textContent="アイコン辞書が空です。右上の「再読込」でサーバーから取得してください";return}
-  if((F.a.some(Boolean)||F.d.some(Boolean))&&!confirm("入力済みの編成を、読み取り結果で置き換えます。よろしいですか?"))return;
+  if((F.a.some(Boolean)||F.d.some(Boolean))&&!await ask("入力済みの編成を、読み取り結果で置き換えます。よろしいですか?"))return;
   PQ=fs;PN=fs.length;await nextShot();
 }
 async function nextShot(){
@@ -595,23 +698,24 @@ async function nextShot(){
   st.textContent=pf+"読み取り中";if(PN>1)window.scrollTo(0,0);
   try{
     const im=await imgData(f),m=await matchAll(im),r=judge(im),ro=roleOf(im);NF=nameFeat(im,0,0);const nm=nameMatch(im);
-    F.a=m.slice(0,6).map(x=>x.n);F.d=m.slice(6).map(x=>x.n);F.g={0:"",4:"",5:""};F.ga={0:"",4:"",5:""};
-    MISS=new Set();CAND={};AMB=new Set();HQ=[];m.forEach((x,i)=>{const k=i<6?"a"+i:"d"+(i-6);CAND[k]=x.c;if(!x.n)MISS.add(k);else if(isH(x.n)){HQ.push(k);AMB.add(k)}else if(x.m<0.03)AMB.add(k)});
-    if(r)F.r=r;if(ro!=null){F.o=ro;if(editId==null){S.role=ro;saveLocal()}}if(nm)F.n=nm.n;drawForm();if(HQ.length){const k=HQ.shift();askH(k[0],+k[1])}
-    const ok=m.length-MISS.size,nt=(ro==null?"":`【${ro==="D"?"防衛":"攻撃"}】`)+(nm?`相手「${nm.n}」を自動入力。`:"");
-    st.textContent=pf+nt+`${ok}/12枠を読み取りました`+(r?`(${r})`:"(勝敗は判別できませんでした)")+(MISS.size?`。黄色の枠が未認識です(しきい値 ${S.th})`:"。確認して保存してください")+(AMB.size?`。他に${AMB.size}枠が似たアイコンと僅差です(黄色)。枠をタップすると上位候補が出ます`:"");
-  }catch(e){st.textContent=pf+"読み取りに失敗しました: "+(e&&e.message||"");drawForm()}
+    F.t0=f.lastModified||0;F.a=m.slice(0,6).map(x=>x.n);F.d=m.slice(6).map(x=>x.n);
+    CALF=F;CAL={};m.forEach((x,i)=>{if(x.n)CAL[(i<6?"a":"d")+(i%6)]={n:x.n,s:x.s,m:x.m}});
+    MISS=new Set();CAND={};AMB=new Set();HQ=[];m.forEach((x,i)=>{const k=i<6?"a"+i:"d"+(i-6);CAND[k]=x.c;if(!x.n)MISS.add(k);else if(isH(x.n)){HQ.push(k);AMB.add(k)}else if(x.m<0.06||x.s<S.th||(x.m<0.12&&sameChar(x.n,x.c.find(c=>c!==x.n))))AMB.add(k)});
+    F.r=r||"";if(ro!=null){F.o=ro;if(editId==null){S.role=ro;saveLocal()}}if(nm)F.n=nm.n;drawForm();if(HQ.length){const k=HQ.shift();askH(k[0],+k[1])}
+    const ok=m.length-MISS.size,nt=(ro==null?"":`【${ro==="D"?"防衛":"攻撃"}】`)+(nm?`相手「${nm.n}」を自動入力(要確認)。`:"");
+    st.textContent=pf+nt+`${ok}/12枠を読み取りました`+(r?`(${r})`:"(勝敗は判別できませんでした)")+(MISS.size?`。黄色の枠が未認識です(しきい値 ${S.th})`:"。確認して保存してください")+(AMB.size?`。他に${AMB.size}枠が確信度の低い読み取りです(黄色)。必ず確認してください。枠をタップすると上位候補が出ます`:"");
+  {const dg=layoutDiag(im,ok,r,ro);if(dg)st.textContent+=" ⚠ "+dg}}catch(e){st.textContent=pf+"読み取りに失敗しました: "+(e&&e.message||"");drawForm()}
 }
 
 /* 履歴 */
-let H={q:"",se:seasonOf(Date.now()),fd:Array(6).fill(""),fg:{0:"",4:"",5:""},per:"all",so:"new",mo:"",ds:"rate",lim:30};
+let H={seAuto:true,me:"",q:"",se:seasonOf(Date.now()),fd:Array(6).fill(""),per:"all",so:"new",mo:"",ds:"rate",lim:30};
 const CH=(k,v,l)=>`<button class="chip${H[k]===v?" on":""}" data-k="${k}" data-v="${esc(v)}">${esc(l)}</button>`;
 function drawChips(){
-  $("#hc").innerHTML=[CH("se","","全シーズン"),...seasons().map(x=>CH("se",x,x))].join("")+`<i class="br"></i>`+[CH("per","all","全期間"),CH("per","1","今日"),CH("per","7","7日"),CH("per","30","30日")].join("")+`<i class="br"></i>`+
-   (H.mo==="D"?[CH("ds","rate","勝率順"),CH("ds","n","戦数順"),CH("ds","new","新しい順")]:[CH("so","new","新しい順"),CH("so","old","古い順")]).join("");
-  $("#hf").innerHTML=IDX.map(k=>`<div><button data-fs="${k}" class="${H.fd[k]?"set":""}" aria-label="絞り込み ${NM[k]} ${esc(H.fd[k])||"指定なし"}"><span class="sq">${iconImg(H.fd[k]===HB?H1:H.fd[k])}<span class="pos">${NM[k]}</span>${H.fd[k]?"":"－"}</span><span class="nm">${esc(H.fd[k])||"　"}</span></button></div>`).join("");
+  $("#hc").innerHTML=[CH("se","","全シーズン"),...seasons().map(x=>CH("se",x,x))].join("")+`<i class="br"></i>`+[CH("per","all","全期間"),CH("per","1","今日"),CH("per","7","7日"),CH("per","30","30日"),CH("me","","全員"),CH("me","1","自分のみ")].join("")+`<i class="br"></i>`+
+   (H.mo==="D"?[CH("ds","rate","勝率順(少数補正)"),CH("ds","n","戦数順"),CH("ds","new","新しい順")]:[CH("so","new","新しい順"),CH("so","old","古い順")]).join("");
+  $("#hf").innerHTML=IDX.map(k=>`<div><button data-fs="${k}" class="${H.fd[k]?"set":""}" aria-label="絞り込み ${NM[k]} ${esc(H.fd[k])||"指定なし"}"><span class="sq">${iconImg(VBASE.has(H.fd[k])?VBASE.get(H.fd[k])[0]:H.fd[k])}<span class="pos">${NM[k]}</span>${H.fd[k]?"":"－"}</span><span class="nm">${esc(H.fd[k])||"　"}</span></button></div>`).join("");
 }
-/* 防衛編成の判定: STR1-4は枠の位置まで一致(育成度は見ない)、SP1/SP2は生徒+育成度の組で順不同。空欄は条件なし */
+/* 防衛編成の判定: STR1-4は枠の位置まで一致、SP1/SP2は順不同。空欄は条件なし */
 function defHit(d,fd){
   for(let k=0;k<4;k++)if(fd[k]&&grp(d[k])!==grp(fd[k]))return false;
   const ok=(fi,ri)=>!fd[fi]||grp(d[ri])===grp(fd[fi]);
@@ -619,14 +723,15 @@ function defHit(d,fd){
 }
 function hit(r){
   if(H.se&&rSeason(r)!==H.se)return false;
+  if(H.me==="1"&&S.me&&r.me!==S.me)return false;
   if((r.o==="D")!==(H.mo==="D"))return false;
   if(H.per!=="all"){
     const t=+new Date(r.t);if(!t)return false;
-    let from;if(H.per==="1"){const d=new Date();d.setHours(0,0,0,0);from=d.getTime()}else from=Date.now()-(+H.per)*864e5;
+    let from;if(H.per==="1"){const d=new Date(Date.now()-RESET_H*36e5);d.setHours(0,0,0,0);from=d.getTime()+RESET_H*36e5}else from=Date.now()-(+H.per)*864e5;
     if(t<from)return false;
   }
-  const q=H.q.trim().toLowerCase();
-  if(q&&!(r.n||"").toLowerCase().includes(q))return false;
+  const q=nz(H.q.trim());
+  if(q&&!nz(r.n||"").includes(q))return false;
   return H.mo==="D"?true:defHit(r.d,H.fd);
 }
 const row=arr=>`<div class="fm">${IDX.map(k=>tile(arr[k],NM[k])).join("")}</div>`;
@@ -641,7 +746,7 @@ function card(r){
   ${r.m?`<p class="mut" style="margin:6px 0 0">${esc(r.m)}</p>`:""}
   <div class="act"><button class="del" data-f="${id}">この防衛で絞り込み</button><button class="del" data-e="${id}">編集</button><button class="del" data-x="${id}">削除</button></div></details></div>`;
 }
-const dayLabel=t=>{const d=new Date(t);return isNaN(d)?"日時不明":d.toLocaleDateString("ja-JP",{month:"numeric",day:"numeric",weekday:"short"})};
+const dayLabel=t=>{const d=new Date(+new Date(t)-RESET_H*36e5);return isNaN(d)?"日時不明":d.toLocaleDateString("ja-JP",{month:"numeric",day:"numeric",weekday:"short"})};
 function dayHtml(rows){
   const ds={};for(const r of rows){const k=dayLabel(r.t),o=ds[k]||(ds[k]={w:0,l:0});if(r.r==="WIN")o.w++;else if(r.r)o.l++}
   let last=null,h="";
@@ -653,7 +758,7 @@ const defKey=a=>[0,1,2,3].map(i=>grp(a[i]||"")).join("|")+"#"+[grp(a[4]||""),grp
 function defGroups(rows){
   const m=new Map();
   for(const r of rows){const k=defKey(r.a);let g=m.get(k);if(!g){g={k,a:r.a,w:0,l:0,t:0,rs:[]};m.set(k,g)}g.rs.push(r);if(r.r==="WIN")g.w++;else if(r.r)g.l++}
-  const gs=[...m.values()],rate=g=>(g.w+g.l)?g.w/(g.w+g.l):-1,cnt=g=>g.w+g.l;
+  const gs=[...m.values()],rate=g=>(g.w+g.l)?(g.w+1)/(g.w+g.l+2):-1,cnt=g=>g.w+g.l;
   for(const g of gs){g.rs.sort((x,y)=>(+new Date(y.t)||0)-(+new Date(x.t)||0));g.a=g.rs[0].a;g.t=+new Date(g.rs[0].t)||0}
   gs.sort(H.ds==="n"?(a,b)=>cnt(b)-cnt(a)||rate(b)-rate(a)||b.t-a.t:H.ds==="new"?(a,b)=>b.t-a.t:(a,b)=>rate(b)-rate(a)||cnt(b)-cnt(a)||b.t-a.t);
   return gs;
@@ -676,14 +781,14 @@ function statsD(recs){
   if(!top.length)return `<p class="mut">集計できる記録がありません</p>`;
   return `<div class="lb">相手の攻撃に多い生徒(守りの勝敗)</div><table class="stt">${top.map(([s,o])=>`<tr><td>${esc(s)}</td><td class="r">${o.n}回</td><td class="r">${o.w}勝${o.k-o.w}敗 ${pct(o.w,o.k)}</td></tr>`).join("")}</table>`;
 }
-const pct=(w,n)=>n?Math.round(w/n*100)+"%"+(n<5?`(n=${n})`:""):"－";
+const pct=(w,n)=>n?Math.round(w/n*100)+"%":"－";
 function stats(recs){
   const dc={},ac={},oc={};
   for(const r of recs){
     for(const s of new Set(r.d.filter(Boolean).map(grp))){const o=dc[s]||(dc[s]={n:0,k:0,w:0});o.n++;if(r.r){o.k++;if(r.r==="WIN")o.w++}}
     if(!r.r)continue;
     if(r.n){const o=oc[r.n]||(oc[r.n]={n:0,w:0});o.n++;if(r.r==="WIN")o.w++}
-    const st=r.a.slice(0,4).filter(Boolean).map(grp).sort(),sp=r.a.slice(4).filter(Boolean).map(grp).sort();
+    const st=r.a.slice(0,4).filter(Boolean).map(grp),sp=r.a.slice(4).filter(Boolean).map(grp).sort();
     if(!st.length&&!sp.length)continue;
     const k=st.join("・")+" / "+sp.join("・"),o=ac[k]||(ac[k]={n:0,w:0});o.n++;if(r.r==="WIN")o.w++;
   }
@@ -693,30 +798,32 @@ function stats(recs){
   const opp=Object.entries(oc).sort((a,b)=>b[1].n-a[1].n).slice(0,10);
   if(!top.length&&!atk.length)return `<p class="mut">集計できる記録がありません</p>`;
   return `<div class="lb">相手の防衛に多い生徒</div><table class="stt">${top.map(([s,o])=>`<tr><td>${esc(s)}</td><td class="r">${o.n}回</td><td class="r">${o.w}勝${o.k-o.w}敗 ${pct(o.w,o.k)}</td></tr>`).join("")}</table>
-  <div class="lb">${act?"この防衛への攻撃編成(勝率順・少数は控えめ補正)":"自分の攻撃編成別の成績"}</div><table class="stt">${atk.map(([k,o])=>`<tr><td>${esc(k)}</td><td class="r">${o.w}勝${o.n-o.w}敗 ${pct(o.w,o.n)}</td></tr>`).join("")}</table>
+  <div class="lb">${act?"この防衛への攻撃編成(勝率順・少数は控えめ補正)":(H.me==="1"?"自分":"全員")+"の攻撃編成別の成績"}</div><table class="stt">${atk.map(([k,o])=>`<tr><td>${esc(k)}</td><td class="r">${o.w}勝${o.n-o.w}敗 ${pct(o.w,o.n)}</td></tr>`).join("")}</table>
   <div class="lb">相手別の成績(対戦数順)</div><table class="stt">${opp.map(([k,o])=>`<tr><td>${esc(k)}</td><td class="r">${o.n}戦</td><td class="r">${o.w}勝${o.n-o.w}敗 ${pct(o.w,o.n)}</td></tr>`).join("")}</table>`;
 }
 function renderHist(){
+  if(H.seAuto)H.se=seasonOf(Date.now());
   drawChips();$("#sbd").textContent=seasonOf(Date.now());
   document.querySelectorAll("#hm button").forEach(b=>b.classList.toggle("on",(b.dataset.m||"")===(H.mo||"")));$("#hfw").hidden=H.mo==="D";$("#hq").hidden=H.mo==="D";if(H.mo==="D"&&H.q){H.q="";$("#hq").value=""}
-  const rows=S.records.filter(hit);
-  rows.sort((a,b)=>{const d=(+new Date(a.t)||0)-(+new Date(b.t)||0);return H.so==="old"?d:-d});
+  const mk=[RV,H.se,H.me,H.mo,H.per,H.q,H.fd.join("\u0001"),H.so,S.me,Math.floor(Date.now()/6e4)].join("|");let rows;if(HM.k===mk)rows=HM.rows;else{rows=S.records.filter(hit);
+  rows.sort((a,b)=>{const d=(+new Date(a.t)||0)-(+new Date(b.t)||0);return H.so==="old"?d:-d});HM={k:mk,rows};}
   const w=rows.filter(r=>r.r==="WIN").length,n=rows.filter(r=>r.r).length;
   $("#sm").innerHTML=`<b>${rows.length}件</b> / 全${S.records.length}件`+(n?`　<b>${w}勝${n-w}敗・勝率${Math.round(w/n*100)}%</b>`:"");
-  $("#ss").innerHTML=H.mo==="D"?statsD(rows):stats(rows);$("#ssd").open=H.mo!=="D"&&(SSU===null?H.fd.some(Boolean):SSU);
+  {const sk=mk+"|"+H.ds;if(HM.sk!==sk){HM.sh=H.mo==="D"?statsD(rows):stats(rows);HM.sk=sk}$("#ss").innerHTML=HM.sh}$("#ssd").open=H.mo!=="D"&&(SSU===null?H.fd.some(Boolean):SSU);
   if(H.mo==="D"){$("#hl").innerHTML=rows.length?defGroups(rows).map(defCard).join(""):`<p class="mut" style="text-align:center">該当する防衛の記録がありません</p>`;return}
   $("#hl").innerHTML=rows.length?dayHtml(rows)+(rows.length>H.lim?`<button class="btn out" id="mr">もっと見る(残り${rows.length-H.lim}件)</button>`:""):`<p class="mut" style="text-align:center">該当する記録がありません</p>`;
   const mr=$("#mr");if(mr&&window.IntersectionObserver){const o=new IntersectionObserver(es=>{if(es[0].isIntersecting){o.disconnect();H.lim+=30;renderHist()}},{rootMargin:"200px"});o.observe(mr)}
 }
-function setFilter(fd,fg){H.fd=fd.slice();H.fg={0:"",4:"",5:"",...(fg||{})};H.lim=30;renderHist();window.scrollTo(0,0)}
+function setFilter(fd){H.fd=fd.slice();H.lim=30;renderHist();window.scrollTo(0,0)}
 
 /* 削除の取り消し(サーバーに同じ内容で登録し直す) */
-let LD=null,tt=null;
-function toast(msg,undo){
-  const t=$("#ts");t.innerHTML=`<span>${esc(msg)}</span>`+(undo?`<button id="tu">元に戻す</button>`:"");t.hidden=false;
-  clearTimeout(tt);tt=setTimeout(()=>{t.hidden=true;LD=null},7000);
+let LD=null,tt=null,TA=null;
+function toast(msg,undo,act,ms){
+  const t=$("#ts");TA=act&&act.fn||null;t.innerHTML=`<span>${esc(msg)}</span>`+(undo?`<button id="tu">元に戻す</button>`:act?`<button id="ta">${esc(act.label)}</button>`:"");t.hidden=false;
+  clearTimeout(tt);tt=setTimeout(()=>{t.hidden=true;LD=null;TA=null},ms||7000);
 }
 $("#ts").onclick=async e=>{
+  if(e.target.id==="ta"&&TA){const f=TA;TA=null;$("#ts").hidden=true;f();return}
   if(e.target.id!=="tu"||!LD)return;
   const r={...LD},id0=LD.id;delete r.id;LD=null;
   try{try{await api("POST","/records/"+encodeURIComponent(id0)+"/restore")}catch(e1){if(!/404/.test(e1.message))throw e1;await api("POST","/records",r)}}catch(err){toast("元に戻せませんでした: "+(err&&err.message||""));return}
@@ -728,7 +835,8 @@ const TL={auto:"自動",dark:"ダーク",light:"ライト"},TI={auto:"◐",dark:
 try{const v=localStorage.getItem("bat-th");if(v&&v[0]==="{"){if(!localStorage.getItem("bat-thumbs"))localStorage.setItem("bat-thumbs",v);localStorage.removeItem("bat-th")}}catch(e){}
 let theme="auto";try{theme=localStorage.getItem("bat-th")||"auto"}catch(e){}
 if(!TK.includes(theme))theme="auto";
-function applyTheme(t){const h=document.documentElement;t==="auto"?h.removeAttribute("data-theme"):h.setAttribute("data-theme",t);$("#th").textContent=TI[t]+" テーマ: "+TL[t]}
+function applyTheme(t){const h=document.documentElement;t==="auto"?h.removeAttribute("data-theme"):h.setAttribute("data-theme",t);$("#th").textContent=TI[t]+" テーマ: "+TL[t];const dk=t==="dark"||(t==="auto"&&matchMedia("(prefers-color-scheme: dark)").matches);$("#tc").content=dk?"#0f1519":"#0e8fa8"}
+try{matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>applyTheme(theme))}catch(e){}
 $("#th").onclick=()=>{theme=TK[(TK.indexOf(theme)+1)%3];try{localStorage.setItem("bat-th",theme)}catch(e){}applyTheme(theme)};
 
 /* タブ・イベント */
@@ -739,29 +847,39 @@ function tab(t){
 }
 document.querySelectorAll("#nv button").forEach(b=>b.onclick=()=>tab(b.dataset.t));
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&!$("#hs").hidden&&Date.now()-LLT>30000)loadRecords().then(ok=>{if(ok)renderHist()})});
-$("#rl").onclick=()=>syncAll().then(flushQ);window.addEventListener("online",flushQ);
+$("#rl").onclick=()=>syncAll(true).then(flushQ);window.addEventListener("online",flushQ);
 $("#bd").onclick=boardClick;$("#ba").onclick=boardClick;
 document.querySelectorAll(".rb").forEach(b=>b.onclick=()=>{F.r=F.r===b.dataset.r?"":b.dataset.r;drawForm()});
 $("#m").oninput=e=>F.m=e.target.value;
-$("#ca").onclick=()=>{F.a=Array(6).fill("");F.ga={0:"",4:"",5:""};for(let i=0;i<6;i++)MISS.delete("a"+i);drawForm()};
-$("#cd").onclick=()=>{F.d=Array(6).fill("");F.g={0:"",4:"",5:""};for(let i=0;i<6;i++)MISS.delete("d"+i);drawForm()};
-$("#qs").onclick=async()=>{if(!PQ.length)return;F=fresh();MISS=new Set();CAND={};AMB=new Set();HQ=[];editId=null;await nextShot()};
+$("#ca").onclick=()=>{F.a=Array(6).fill("");for(let i=0;i<6;i++)MISS.delete("a"+i);drawForm()};
+$("#cd").onclick=()=>{F.d=Array(6).fill("");for(let i=0;i<6;i++)MISS.delete("d"+i);drawForm()};
+$("#qs").onclick=async()=>{if(!PQ.length)return;resetForm();await nextShot()};
 $("#qx").onclick=()=>{PQ=[];PN=0;drawForm();$("#rst").textContent="残りの読み取りをやめました"};
 $("#sv").onclick=saveRec;$("#shot").onchange=recog;
 $("#ct").onclick=()=>{S.cont=!S.cont;saveLocal();drawForm()};
 $("#mq").onclick=()=>{const k=[...MISS][0];if(k){chain=true;openSheet(k[0],+k[1])}};
-$("#ebx").onclick=()=>{NF=null;editId=null;F=fresh();MISS=new Set();drawForm()};
+$("#ebx").onclick=()=>{resetForm();drawForm()};
 $("#sq").oninput=drawSheet;
-$("#sq").onkeydown=e=>{if(e.key==="Enter"){const b=$("#sl [data-p]"),x=hw($("#sq").value);if(b)pick(b.dataset.p);else if(x)pick(x)}};
+$("#sq").onkeydown=e=>{if(e.isComposing||e.keyCode===229)return;if(e.key==="Enter"){const b=$("#sl [data-p]"),x=hw($("#sq").value);if(b)pick(b.dataset.p);else if(x)pick(x)}};
 $("#sl").onclick=e=>{const b=e.target.closest("[data-p]");if(b)pick(b.dataset.p)};
 $("#sok").onclick=()=>{const x=hw($("#sq").value);if(x)pick(x)};
 $("#sem").onclick=()=>pick("");
 $("#shx").onclick=()=>{chain=false;HQ=[];$("#sh").hidden=true};
-document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("#sh").hidden){chain=false;HQ=[];$("#sh").hidden=true}});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("#sh").hidden&&$("#dg").hidden){chain=false;HQ=[];$("#sh").hidden=true}});
 $("#sh").onclick=e=>{if(e.target.id==="sh"){chain=false;HQ=[];$("#sh").hidden=true}};
+/* モーダル: 開いたらフォーカスを中へ・背景を操作不可に・スクロール固定、閉じたら元のボタンへ戻す */
+let SHF=null,SHO=false;
+new MutationObserver(()=>{
+  const o=!$("#sh").hidden;
+  if(o===SHO){if(o&&!$("#sh").contains(document.activeElement))$("#sh .sc").focus();return}
+  SHO=o;document.body.style.overflow=o?"hidden":"";
+  for(const e of[document.querySelector(".wrap"),$("#nv")])e.inert=o;
+  if(o){SHF=document.activeElement;if(!(matchMedia("(hover:hover)").matches&&!$("#sq").hidden))$("#sh .sc").focus()}
+  else{const f=SHF;SHF=null;if(f&&f.isConnected&&f.focus)f.focus()}
+}).observe($("#sh"),{attributes:true,attributeFilter:["hidden"]});
 $("#sun").onclick=()=>{SHOWALL=!SHOWALL;drawSheet()};
 $("#hq").oninput=e=>{H.q=e.target.value;H.lim=30;renderHist()};
-$("#hc").onclick=e=>{const b=e.target.closest("[data-k]");if(b){H[b.dataset.k]=b.dataset.v;H.lim=30;renderHist()}};
+$("#hc").onclick=e=>{const b=e.target.closest("[data-k]");if(b){if(b.dataset.k==="se")H.seAuto=false;H[b.dataset.k]=b.dataset.v;H.lim=30;renderHist()}};
 $("#hf").onclick=e=>{const b=e.target.closest("[data-fs]");if(b){chain=false;openSheet("f",+b.dataset.fs)}};
 $("#hfc").onclick=()=>{H.q="";$("#hq").value="";setFilter(Array(6).fill(""))};
 $("#hm").onclick=e=>{const b=e.target.closest("[data-m]");if(b){H.mo=b.dataset.m;H.lim=30;renderHist();window.scrollTo(0,0)}};
@@ -770,13 +888,13 @@ $("#hl").addEventListener("toggle",e=>{const d=e.target.closest&&e.target.closes
 $("#hl").onclick=async e=>{
   if(e.target.closest("#mr")){H.lim+=30;renderHist();return}
   const fb=e.target.closest("[data-f]");
-  if(fb){const r=byId(fb.dataset.f);if(r)setFilter(r.d,r.g);return}
+  if(fb){const r=byId(fb.dataset.f);if(r)setFilter(r.d);return}
   const ed=e.target.closest("[data-e]");if(ed){startEdit(ed.dataset.e);return}
   const x=e.target.closest("[data-x]");if(!x)return;
-  const id=x.dataset.x,r=byId(id);if(!r)return;if(!confirm("この記録を削除しますか?"))return;
+  const id=x.dataset.x,r=byId(id);if(!r)return;if(!await ask("この記録を削除しますか?"))return;
   try{await api("DELETE","/records/"+encodeURIComponent(id))}catch(err){toast("削除に失敗しました: "+(err&&err.message||""));return}
   LD=r;
-  if(editId!=null&&String(editId)===String(id)){editId=null;F=fresh();MISS=new Set();drawForm()}
+  if(editId!=null&&String(editId)===String(id)){resetForm();drawForm()}
   await loadRecords();refreshDL();renderHist();toast("記録を削除しました",true);
 };
 
@@ -788,25 +906,30 @@ $("#ob").onclick=()=>{
 };
 
 /* 管理者: 生徒リストとアイコン辞書の編集(キーを入れた端末のみ表示) */
+let ADMD=false;
+$("#adm").addEventListener("input",e=>{if(e.target.matches("#lst,#lsp,#lth"))ADMD=true});
+/* 注意: これは表示制御だけ。書き込み・削除・設定変更の権限チェックは必ずWorker側で行うこと */
 const applyMode=()=>{$("#adm").hidden=!(KEY&&ROLE==="admin");if(KEY&&ROLE==="admin")fillAdm()};
 function fillAdm(){
   $("#kinfo").textContent="この端末に管理キーが保存されています";
-  $("#lth").value=S.th;
-  $("#lst").value=S.st.join("\n");$("#lsp").value=S.sp.join("\n");
+  if(!ADMD){$("#lth").value=S.th;$("#lst").value=S.st.join("\n");$("#lsp").value=S.sp.join("\n")}
   $("#adl").innerHTML=[...new Set([...kindList("st"),...kindList("sp")])].map(x=>`<option value="${esc(x)}">`).join("");
+  if(!SED)drawSeasons();
+  drawCal();
   drawDL();
 }
 $("#lsb").onclick=async()=>{
   const f=t=>[...new Set($(t).value.split("\n").map(hw).filter(Boolean))];
-  try{await api("PUT","/config",{students:{st:f("#lst"),sp:f("#lsp")},th:parseFloat($("#lth").value)||undefined,players:S.cpl})}catch(e){$("#lsm").textContent="保存に失敗しました: "+(e&&e.message||"");return}
-  $("#lsm").textContent="保存しました";syncAll();
+  try{await api("PUT","/config",{students:{st:f("#lst"),sp:f("#lsp")},th:parseFloat($("#lth").value)||undefined,players:S.cpl,...sOut()})}catch(e){$("#lsm").textContent="保存に失敗しました: "+(e&&e.message||"");return}
+  $("#lsm").textContent="保存しました";ADMD=false;syncAll();
 };
 /* 全角の英数記号(かっこ含む)と全角スペースを半角にする。かな・漢字・長音は変えない */
 const decodeName=n=>{if(!/^[0-9A-Fa-f_]{12,}$/.test(n))return n;try{const h=n.replace(/_/g,"");if(h.length%2)return n;const b=Uint8Array.from(h.match(/../g),x=>parseInt(x,16));const t=new TextDecoder("utf-8",{fatal:true}).decode(b).replace(/\.[^.]+$/,"").replace(/^img_?/i,"").replace(/_?icon$/i,"");return t||n}catch(e){return n}};
 const sampleName=(n,ex)=>{const u=new Set([...TPL.map(t=>t.n),...ex.map(j=>j.n)]);if(!u.has(n))return n;let i=2;while(u.has(`${n}#${i}`))i++;return `${n}#${i}`};
 const thumbOf=(cv,b)=>{const t=document.createElement("canvas");t.width=72;t.height=60;t.getContext("2d").drawImage(cv,b.x,b.y,b.w,b.h,0,0,72,60);return t.toDataURL("image/jpeg",.82)};
-const keepTh=(n,th)=>{if(!th)return;const m=LS.get("bat-thumbs",{});m[n]=th;LS.set("bat-thumbs",m)};
-const b64=u=>btoa(String.fromCharCode(...u));
+let thT=null;
+const keepTh=(n,th)=>{if(!th)return;const m=DBG("bat-thumbs",{});m[n]=th;DBK["bat-thumbs"]=m;clearTimeout(thT);thT=setTimeout(()=>DBS("bat-thumbs",m).catch(e=>rep("サムネ保存",e)),500)};
+const b64=u=>{let s="";for(let i=0;i<u.length;i+=8192)s+=String.fromCharCode.apply(null,u.subarray?u.subarray(i,i+8192):u.slice(i,i+8192));return btoa(s)};
 let AD=null;
 $("#ish").onchange=async()=>{
   const f=$("#ish").files[0];if(!f)return;
@@ -860,7 +983,7 @@ $("#ifl").onchange=async()=>{
       const bw=Math.round(w*IW),bh=Math.round(bw*5/6),bx={x:Math.round(ox+w*IX-bw/2),y:Math.round(oy+h*IY-bh/2),w:bw,h:bh};
       const t=document.createElement("canvas");t.width=128;t.height=128;const sc=Math.max(128/w,128/h),sw=128/sc,sh=128/sc;t.getContext("2d").drawImage(cv,ox+(w-sw)/2,oy+(h-sh)/2,sw,sh,0,0,128,128);
       IR.push({n:hw(decodeName(f.name.replace(/\.[^.]+$/,"").trim())),k,d:b64(feat(im,bx)),th:t.toDataURL("image/jpeg",.82)});
-    }catch(e){bad++}
+    }catch(e){bad++;warn("icon file",e)}
   }
   $("#ifl").value="";drawIR();
   $("#ims").textContent=bad?`${bad}件は画像として読み込めませんでした`:"";
@@ -871,7 +994,7 @@ $("#igo").onclick=async()=>{
   const jobs=IR.map(r=>({n:hw(r.n),k:r.k,d:r.d,th:r.th}));
   if(jobs.some(j=>!j.n)){$("#ims").textContent="名前が空の行があります";return}
   const ow=jobs.filter(j=>TPL.some(t=>t.n===j.n)).length;
-  if(ow&&!confirm(`${ow}件は登録済みの名前です。上書きしますか?`))return;
+  if(ow&&!await ask(`${ow}件は登録済みの名前です。上書きしますか?`))return;
   const btn=$("#igo");btn.disabled=true;let done=0,err="",i=0;
   const run=async()=>{while(i<jobs.length&&!err){const j=jobs[i++];try{await api("POST","/icons",j);keepTh(j.n,j.th);done++}catch(e){err=e&&e.message||"error"}$("#ims").textContent=`登録中 ${done}/${jobs.length}`}};
   await Promise.all([run(),run(),run(),run()]);
@@ -880,14 +1003,56 @@ $("#igo").onclick=async()=>{
   if(!err){IR=[];drawIR()}
   syncAll();
 };
+/* 認識の実績: スクショ由来の自動入力が、保存時にそのまま残ったか(訂正・削除されなかったか)をスコア帯ごとに集計 */
+const CALB=[[0,.65],[.65,.75],[.75,.85],[.85,9]];
+function drawCal(){
+  const a=LS.get("bat-cal",[]);
+  if(!a.length){$("#cal").innerHTML=`<p class="mut" style="margin:0">まだ実績がありません。スクショ読み取りで保存するたびに、自動入力が訂正されたかを記録します</p>`;return}
+  const sug=(()=>{for(const lo of[.55,.65,.75,.85]){const g=a.filter(x=>x.s>=lo);if(g.length>=20&&g.filter(x=>x.ok).length/g.length>=.95)return lo}return null})(),rows=CALB.map(([lo,hi])=>{const g=a.filter(x=>x.s>=lo&&x.s<hi),ok=g.filter(x=>x.ok).length;
+    return `<tr><td>${lo?lo.toFixed(2):"0"}〜${hi>=9?"":hi.toFixed(2)}</td><td class="r">${g.length}枠</td><td class="r">${g.length?Math.round(ok/g.length*100)+"%":"－"}</td></tr>`}).join("");
+  $("#cal").innerHTML=`<p class="mut" style="margin:0">しきい値 ${S.th}。類似度の帯ごとに、自動入力がそのまま保存された割合(直近${a.length}枠)。低い帯で割合が高ければ、しきい値を下げて手入力を減らせます${sug==null?"(推奨値を出すには、95%以上が無訂正の帯が20枠以上必要です)":`(目安: ${sug} 以上なら95%以上が無訂正。この端末だけの実績です)`}</p><table class="stt"><tr><td>類似度</td><td class="r">枠数</td><td class="r">無訂正</td></tr>${rows}</table>`;
+}
+$("#calx").onclick=async()=>{if(await ask("認識の実績を消します。よろしいですか?")){LS.set("bat-cal",[]);drawCal()}};
+/* シーズン設定(管理者) */
+let SEW=[],SED=false;
+const jst16=t=>{const d=new Date(t);return isNaN(d)?"":d.toLocaleString("sv-SE",{timeZone:"Asia/Tokyo"}).replace(" ","T").slice(0,16)};
+function drawSeasons(){
+  if(!SED)SEW=SEASONS.map(x=>({n:x.n,f:jst16(x.from)}));
+  $("#sew").innerHTML=SEW.map((x,i)=>`<div class="sr"><b>S</b><input type="number" min="1" inputmode="numeric" data-sn="${i}" value="${esc(x.n)}" aria-label="シーズン番号"><input type="datetime-local" data-sf="${i}" value="${esc(x.f)}" aria-label="開始日時(日本時間)"><button class="del" data-sx="${i}" aria-label="この行を削除">×</button></div>`).join("")||`<p class="mut">設定なし(既定の表を使用中)</p>`;
+}
+$("#sew").oninput=e=>{const t=e.target;if(t.dataset.sn!=null)SEW[+t.dataset.sn].n=t.value;else if(t.dataset.sf!=null)SEW[+t.dataset.sf].f=t.value;SED=true};
+$("#sew").onclick=e=>{const b=e.target.closest("[data-sx]");if(!b)return;SEW.splice(+b.dataset.sx,1);SED=true;drawSeasons()};
+$("#seadd").onclick=()=>{const mx=Math.max(0,...SEW.map(x=>parseInt(x.n,10)||0));SEW.unshift({n:mx?mx+1:12,f:""});SED=true;drawSeasons()};
+$("#sesv").onclick=async()=>{
+  const m=$("#semsg"),out=[];
+  for(const x of SEW){const n=parseInt(x.n,10),f=String(x.f||"").slice(0,16);
+    if(!(n>0)||f.length<16||isNaN(new Date(f+":00+09:00"))){m.textContent="番号と開始日時を、すべての行に入力してください";return}
+    out.push({n,from:f+":00+09:00"})}
+  if(new Set(out.map(x=>x.n)).size!==out.length){m.textContent="同じシーズン番号が重複しています";return}
+  out.sort((a,b)=>+new Date(b.from)-+new Date(a.from));
+  for(let i=1;i<out.length;i++)if(out[i].n>=out[i-1].n){m.textContent="開始日時が新しい行ほど、番号を大きくしてください";return}
+  const b=$("#sesv");b.disabled=true;m.textContent="保存中…";
+  try{
+    await api("PUT","/config",{students:{st:S.st,sp:S.sp},th:S.th,players:S.cpl,seasons:out});
+    let c=null;try{c=await api("GET","/config")}catch(e){warn("config verify",e)}
+    const ok=!!(c&&Array.isArray(c.seasons)&&c.seasons.length===out.length);
+    if(out.length){setSeasons(out);if(ok){LS.set("bat-seasons",null);cacheSet("config",c)}else LS.set("bat-seasons",out)}
+    else{SEASONS=[{n:12,from:"2026-11-11T00:00:00+09:00"}];SCUST=false;LS.set("bat-seasons",null)}
+    SED=false;drawSeasons();renderHist();drawForm();
+    m.textContent=!out.length?"既定の表に戻しました":ok?"保存しました(サーバーに保存)":"サーバーがseasonsを保存しませんでした(Workerの更新が必要)。この端末にだけ保存しました";
+  }catch(e){m.textContent="保存に失敗しました: "+(e&&e.message||"")}
+  b.disabled=false;
+};
 let DSEL=new Set();
 function drawDL(){
+  const keep={};document.querySelectorAll("#dl .dn").forEach(i=>{const o=i.closest(".dr").dataset.o;if(i.value!==o)keep[o]=i.value});
   for(const n of [...DSEL])if(!TPL.some(t=>t.n===n))DSEL.delete(n);
-  const q=($("#dq").value||"").trim().toLowerCase();
-  const l=TPL.slice().sort((a,b)=>(a.k||"z").localeCompare(b.k||"z")||a.n.localeCompare(b.n,"ja")).filter(t=>!q||t.n.toLowerCase().includes(q));
+  const q=nz(($("#dq").value||"").trim());
+  const l=TPL.slice().sort((a,b)=>(a.k||"z").localeCompare(b.k||"z")||a.n.localeCompare(b.n,"ja")).filter(t=>!q||nz(t.n).includes(q));
   $("#dh").textContent=`登録済みアイコン(${TPL.length}件${q?`・表示${l.length}件`:""})`;
   $("#dl").innerHTML=l.map((t,i)=>`<div class="dr" data-o="${esc(t.n)}">${t.th?`<img class="tm" src="${esc(tu(t.th))}" alt="">`:`<canvas width="16" height="16" data-ci="${i}"></canvas>`}<div><input class="dn" value="${esc(t.n)}" aria-label="生徒名"><div class="rw"><label class="ck"><input type="checkbox" data-ck${DSEL.has(t.n)?" checked":""} aria-label="選択"></label><select class="dk" aria-label="ロール">${["st","sp",""].map(v=>`<option value="${v}"${(t.k||"")===v?" selected":""}>${v==="st"?"ST":v==="sp"?"SP":"未設定"}</option>`).join("")}</select><button class="del" data-sv>保存</button><button class="del" data-dx>削除</button></div></div></div>`).join("");
   l.forEach((t,i)=>{const cv=$(`[data-ci="${i}"]`);if(!cv)return;const x=cv.getContext("2d"),id=x.createImageData(16,16);for(let p=0;p<256;p++){id.data[p*4]=t.f[p*3];id.data[p*4+1]=t.f[p*3+1];id.data[p*4+2]=t.f[p*3+2];id.data[p*4+3]=255}x.putImageData(id,0,0)});
+  document.querySelectorAll("#dl .dr").forEach(r=>{const v=keep[r.dataset.o];if(v!=null)r.querySelector(".dn").value=v});
   $("#dm").textContent=TPL.length?(l.length?"":"該当なし"):"まだ登録がありません";
   $("#ddel").textContent=`選択を削除(${DSEL.size}件)`;
 }
@@ -896,7 +1061,7 @@ $("#dl").addEventListener("change",e=>{const c=e.target.closest("[data-ck]");if(
 $("#dsa").onclick=()=>{const rows=[...document.querySelectorAll("#dl .dr")].map(r=>r.dataset.o),all=rows.length&&rows.every(n=>DSEL.has(n));for(const n of rows)all?DSEL.delete(n):DSEL.add(n);drawDL()};
 $("#ddel").onclick=async()=>{
   const L=[...DSEL];if(!L.length)return;
-  if(!confirm(`選択した${L.length}件を辞書から削除します。元に戻せません。よろしいですか?`))return;
+  if(!await ask(`選択した${L.length}件を辞書から削除します。元に戻せません。よろしいですか?`))return;
   const b=$("#ddel");b.disabled=true;let i=0,done=0,err="";
   const run=async()=>{while(i<L.length&&!err){const n=L[i++];try{await api("DELETE","/icons/"+encodeURIComponent(n));DSEL.delete(n);done++}catch(e){err=e&&e.message||"error"}b.textContent=`削除中 ${done}/${L.length}`}};
   await Promise.all([run(),run(),run(),run()]);
@@ -908,66 +1073,122 @@ $("#dl").onclick=async e=>{
   const row=e.target.closest(".dr");if(!row)return;
   const o=row.dataset.o,t=TPL.find(x=>x.n===o);if(!t)return;
   if(e.target.closest("[data-dx]")){
-    if(!confirm(`「${o}」を辞書から削除しますか?`))return;
-    try{await api("DELETE","/icons/"+encodeURIComponent(o))}catch(err){alert("削除に失敗しました: "+(err&&err.message||""));return}
+    if(!await ask(`「${o}」を辞書から削除しますか?`))return;
+    try{await api("DELETE","/icons/"+encodeURIComponent(o))}catch(err){await say("削除に失敗しました: "+(err&&err.message||""));return}
     syncAll();return;
   }
   if(e.target.closest("[data-sv]")){
     const n=hw(row.querySelector(".dn").value),k=row.querySelector(".dk").value||null;
-    if(!n){alert("名前が空です");return}
+    if(!n){await say("名前が空です");return}
     if(n===o&&(t.k||null)===k)return;
-    if(n!==o&&TPL.some(x=>x.n===n)&&!confirm(`「${n}」はすでに登録済みです。そのアイコンを上書きしますか?`))return;
-    try{await api("POST","/icons",{n,k,d:t.d,th:t.th||undefined});if(n!==o)await api("DELETE","/icons/"+encodeURIComponent(o));keepTh(n,t.th)}catch(err){alert("保存に失敗しました: "+(err&&err.message||""));return}
+    if(n!==o&&TPL.some(x=>x.n===n)&&!await ask(`「${n}」はすでに登録済みです。そのアイコンを上書きしますか?`))return;
+    try{await api("POST","/icons",{n,k,d:t.d,th:t.th||undefined});if(n!==o)await api("DELETE","/icons/"+encodeURIComponent(o));keepTh(n,t.th)}catch(err){await say("保存に失敗しました: "+(err&&err.message||""));return}
     syncAll();
   }
 };
 
 /* バックアップ・復元・共通候補 */
 function dl(name,text,type){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000)}
+const jt=t=>{const d=new Date(t);return isNaN(d)?"":d.toLocaleString("sv-SE",{timeZone:"Asia/Tokyo"})};
 const stamp=()=>new Date().toISOString().slice(0,10);
-$("#nmc").onclick=()=>{if(!NAMES.length){$("#nmm").textContent="記憶はありません";return}if(!confirm(`覚えた相手名${NAMES.length}件を消します。よろしいですか?`))return;NAMES=[];LS.set("bat-names",NAMES);$("#nmm").textContent="消しました"};
-$("#bkj").onclick=()=>dl(`tactics-backup-${stamp()}.json`,JSON.stringify({v:1,records:S.records,icons:TPL.map(t=>({n:t.n,k:t.k||null,d:t.d,th:t.th||undefined})),config:{students:{st:S.st,sp:S.sp},growth:S.growth,th:S.th},players:allPlayers(),names:NAMES}),"application/json");
+$("#nmc").onclick=async()=>{if(!NAMES.length){$("#nmm").textContent="記憶はありません";return}if(!await ask(`覚えた相手名${NAMES.length}件を消します。よろしいですか?`))return;NAMES=[];LS.set("bat-names",NAMES);$("#nmm").textContent="消しました"};
+$("#bkj").onclick=()=>dl(`tactics-backup-${stamp()}.json`,JSON.stringify({v:1,records:S.records,icons:TPL.map(t=>({n:t.n,k:t.k||null,d:t.d,th:t.th||undefined})),config:{students:{st:S.st,sp:S.sp},th:S.th},players:allPlayers(),names:NAMES,cal:LS.get("bat-cal",[])}),"application/json");
 $("#bkc").onclick=()=>{
-  const q=v=>{let t=String(v??"");if(/^[=+\-@\t\r]/.test(t))t="'"+t;return `"${t.replace(/"/g,'""')}"`};
+  const q=v=>{let t=String(v??"");if(/^[=+\-@\t\r]/.test(t)&&!/^[-+]?\d+(\.\d+)?$/.test(t))t="'"+t;return `"${t.replace(/"/g,'""')}"`};
   const h=["日時","シーズン","勝敗","自分","相手",...NM.map(x=>"相手側"+x),...NM.map(x=>"自分側"+x),"編成提供者","メモ","種別"];
-  const rows=S.records.map(r=>[r.t,rSeason(r),r.r,r.me,r.n,...r.d,...r.a,r.p,r.m,r.o==="D"?"防衛":"攻撃"]);
+  const rows=S.records.map(r=>[jt(r.t),rSeason(r),r.r,r.me,r.n,...r.d,...r.a,r.p,r.m,r.o==="D"?"防衛":"攻撃"]);
   dl(`tactics-records-${stamp()}.csv`,"\ufeff"+[h,...rows].map(r=>r.map(q).join(",")).join("\r\n"),"text/csv");
 };
 $("#bki").onchange=async()=>{
   const f=$("#bki").files[0];if(!f)return;const m=$("#bkm");let ok=0;
   try{
     const j=JSON.parse(await f.text()),recs=Array.isArray(j)?j:(j.records||[]),ics=Array.isArray(j.icons)?j.icons:[];
-    const have=new Set(S.records.map(r=>r.t+"|"+r.n+"|"+(r.o||"")));
-    const nr=recs.filter(r=>r&&!have.has(r.t+"|"+r.n+"|"+(r.o||""))),ni=ics.filter(x=>x&&x.n&&x.d&&!TPL.some(t=>t.n===x.n));
-    if(!confirm(`記録${nr.length}件(重複${recs.length-nr.length}件は除外)と新規アイコン${ni.length}件を追加します。よろしいですか?`)){$("#bki").value="";return}
+    const have=new Set(S.records.map(rk));
+    const nr=recs.filter(r=>r&&!have.has(rk(r))),ni=ics.filter(x=>x&&x.n&&x.d&&!TPL.some(t=>t.n===x.n));
+    if(!await ask(`記録${nr.length}件(重複${recs.length-nr.length}件は除外)と新規アイコン${ni.length}件を追加します(生徒リストも足りない分を追加)。よろしいですか?`)){$("#bki").value="";return}
     const tot=nr.length+ni.length;
     for(let i=0;i<nr.length;i+=100){const ch=nr.slice(i,i+100).map(r=>{const c={...r};delete c.id;return c});await api("POST","/records/bulk",ch);ok+=ch.length;m.textContent=`登録中 ${ok}/${tot}`}
     for(const x of ni){await api("POST","/icons",{n:x.n,k:x.k||null,d:x.d,th:x.th||undefined});ok++;m.textContent=`登録中 ${ok}/${tot}`}
     if(Array.isArray(j.names)){for(const x of j.names)if(x&&x.n&&x.d&&!NAMES.some(q=>q.n===x.n&&q.d===x.d))NAMES.push({n:x.n,d:x.d});LS.set("bat-names",NAMES)}
+    if(Array.isArray(j.cal))LS.set("bat-cal",LS.get("bat-cal",[]).concat(j.cal.filter(x=>x&&Number.isFinite(x.s))).slice(-600));
+    {const cf=j.config,cs=cf&&cf.students,cst=Array.isArray(cs)?cs:cs&&cs.st,csp=Array.isArray(cs)?cs:cs&&cs.sp;
+      const u=(a,b)=>[...new Set([...(a||[]),...(Array.isArray(b)?b:[])].filter(x=>typeof x==="string"&&x))];
+      const st=u(S.st,cst),sp=u(S.sp,csp);
+      if(st.length!==S.st.length||sp.length!==S.sp.length)await api("PUT","/config",{students:{st,sp},th:S.th,players:S.cpl,...sOut()})}
     m.textContent=`${ok}件を復元しました`;
   }catch(e){m.textContent=`${ok}件復元後に失敗しました: `+(e&&e.message||"")}
   $("#bki").value="";syncAll();
 };
 $("#plb").onclick=async()=>{
   const l=[...new Set([...S.cpl,...S.players])];
-  try{await api("PUT","/config",{students:{st:S.st,sp:S.sp},th:S.th,players:l})}catch(e){$("#bkm").textContent="保存に失敗しました: "+(e&&e.message||"");return}
+  try{await api("PUT","/config",{students:{st:S.st,sp:S.sp},th:S.th,players:l,...sOut()})}catch(e){$("#bkm").textContent="保存に失敗しました: "+(e&&e.message||"");return}
   $("#bkm").textContent="共通候補に保存しました";syncAll();
 };
 let tp=0,tpt=0;
-$("#sth").onclick=()=>{const n=Date.now();tp=n-tpt>3000?1:tp+1;tpt=n;if(tp>=7){tp=0;$("#kc").hidden=false;$("#ki").focus()}};
-$("#ks").onclick=()=>{const v=$("#ki").value.trim();if(!v)return;KEY=v;try{localStorage.setItem("bat-key",KEY)}catch(e){}$("#ki").value="";$("#kc").hidden=true;applyMode();syncAll()};
-$("#kx").onclick=()=>{if(!confirm("この端末のキーを消します。"))return;KEY="";ROLE="";LS.set("bat-role","");try{localStorage.removeItem("bat-key")}catch(e){}$("#kc").hidden=true;applyMode()};
+
+$("#ks").onclick=()=>{const a=$("#ai").value.trim().replace(/\/+$/,""),v=$("#ki").value.trim();if(!a&&!v)return;
+  if(a&&!/^https?:\/\//.test(a)){toast("サーバーURLは https:// から入力してください");return}
+  if(a){API_BASE=a;try{localStorage.setItem("bat-api",a)}catch(e){rep("端末への保存",e)}}
+  if(v){KEY=v;try{localStorage.setItem("bat-key",KEY)}catch(e){rep("端末への保存",e)}}
+  $("#ki").value="";applyMode();syncAll(true)};
+$("#kx").onclick=async()=>{if(!await ask("この端末のキーを消します。"))return;KEY="";ROLE="";LS.set("bat-role","");try{localStorage.removeItem("bat-key")}catch(e){}applyMode()};
 $("#ssd").querySelector("summary").onclick=()=>{SSU=!$("#ssd").open};
-addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("#sh").hidden)$("#shx").click()});
 (async()=>{
+  $("#vr").textContent="戦術対抗戦ログ "+VER;
+  await dbLoad(["bat-cache","bai-cache","bat-thumbs"]);
   const L=LS.get("bat-local",{});
-  S.players=Array.isArray(L.players)?L.players.filter(x=>typeof x==="string"):[];S.cont=L.ct===true;S.me=typeof L.me==="string"?L.me:"";S.season=typeof L.season==="string"?L.season:"";S.role=L.role==="D"?"D":"";F=fresh();
-  const C=LS.get("bat-cache",{});
-  try{if(C.config)applyConfig(C.config);if(Array.isArray(C.records))S.records=C.records.map(normRec);rebuild(LS.get("bai-cache",[]))}catch(e){}
+  S.players=Array.isArray(L.players)?L.players.filter(x=>typeof x==="string"):[];S.cont=L.ct===true;S.me=typeof L.me==="string"?L.me:"";S.role=L.role==="D"?"D":"";F=fresh();
+  {const ls=LS.get("bat-seasons",null),v=cleanSeasons(ls);if(v.length)setSeasons(v)}
+  const C=DBG("bat-cache",{});
+  try{if(C.config)applyConfig(C.config);if(Array.isArray(C.records))S.records=C.records.map(normRec);rebuild(DBG("bai-cache",[]))}catch(e){warn("cache",e)}
   $("#oq").value=S.players.join("\n");
   applyMode();
-  applyTheme(theme);refreshDL();drawForm();renderHist();
-  syncAll().then(flushQ);
+  $("#ai").value=API_BASE;applyTheme(theme);refreshDL();drawForm();renderHist();
+  syncAll(false,true).then(flushQ);
 })();
-if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+const STX=[];
+async function selfTestExtra(){
+  const ok=(n,c)=>STX.push((c?"OK   ":"FAIL ")+n);
+  ok("hw: 全角英数・半角カナを正規化",hw("Ａｂ１（ヒナ）")==="Ab1(ヒナ)"&&hw("ﾋﾅ")==="ヒナ");
+  ok("hw/nz: 同一名の判定が一致",nz(hw("ＡＢ"))===nz("ab"));
+  {const u=new Uint8Array(100000).map((_,i)=>i%256);ok("b64: 大きい配列でも往復できる",unb64(b64(u)).length===100000)}
+  ok("sinceQ: 10分巻き戻す・形式不明はそのまま",sinceQ("2026-10-15T00:10:00.000Z")==="2026-10-15T00:00:00.000Z"&&sinceQ("12345")==="12345");
+  ok("rk: 別編成は別の記録",rk({t:"x",n:"n",d:["a"],a:[]})!==rk({t:"x",n:"n",d:["b"],a:[]})&&rk({t:"x",n:"n",d:["a"],a:[]})===rk({t:"x",n:"n",d:["a"],a:[]}));
+  {F.n="x";editId=5;MISS.add("a0");AMB.add("d1");chain=true;resetForm();drawForm();ok("resetForm: 全状態を初期化",F.n===""&&editId==null&&MISS.size===0&&AMB.size===0&&!chain)}
+  ok("variant: 別名の統合と基底名の判定",VARS.every(v=>isH(v.base)&&!isH(v.vs[0])&&grp(v.vs[0])===v.base));
+  {const W=2340,H0=1080,im={width:W,height:H0,data:new Uint8ClampedArray(W*H0*4)};
+    for(let p=0;p<im.data.length;p+=4){im.data[p]=im.data[p+1]=im.data[p+2]=30;im.data[p+3]=255}
+    const sd=i=>(x,y,c)=>(((x*73856093)^(y*19349663)^(i*83492791)^(c*2654435761))>>>0)%256;
+    SX.forEach((_,i)=>{const b=slotBox(W,H0,i),g=sd(i+1);for(let y=b.y;y<b.y+b.h;y++)for(let x=b.x;x<b.x+b.w;x++){const p=(y*W+x)*4;im.data[p]=g(x>>2,y>>2,0);im.data[p+1]=g(x>>2,y>>2,1);im.data[p+2]=g(x>>2,y>>2,2)}});
+    const tp=SX.map((_,i)=>{const f=feat(im,slotBox(W,H0,i));return{n:"t"+i,base:"t"+i,k:(i%6)<4?"st":"sp",z:norm(f),g:norm(gradF(f)),f}});
+    try{const m=await matchAll(im,tp);ok("matchAll: 合成画像の12枠を正しく読む",m.every((x,i)=>x.n==="t"+i));
+      ok("layoutDiag: 想定どおりなら警告なし",layoutDiag(im,12,"WIN","")==="")}catch(e){ok("matchAll: 例外 "+e,false)}}
+  ok("layoutDiag: 画面比率の違いを検出",layoutDiag({width:1000,height:1000},12,"WIN","")!=="");
+  ok("layoutDiag: 読めた枠が少ない場合を検出",layoutDiag({width:2340,height:1080},2,"WIN","")!=="");
+}
+async function selfTest(){await selfTestExtra();
+  const r=[],ok=(n,c)=>r.push((c?"OK   ":"FAIL ")+n),A=["a","b","c","d","e","f"];
+  ok("defHit: STRは位置一致",defHit(A,["a","","","","",""])&&!defHit(["b","a","c","d","e","f"],["a","","","","",""]));
+  ok("defHit: SPは順不同",defHit(A,["","","","","f","e"]));
+  ok("defKey: SP順不同",defKey(A)===defKey(["a","b","c","d","f","e"]));
+  ok("defKey: STR順は区別",defKey(A)!==defKey(["b","a","c","d","e","f"]));
+  ok("grp: 別名を1つに統合",VARS.every(v=>v.vs.every(x=>grp(x)===v.base)));
+  ok("seasonOf: 境界",seasonOf("2026-11-10T23:59:00+09:00")==="S11"&&seasonOf("2026-11-11T00:00:00+09:00")==="S12");
+  if(new Date().getTimezoneOffset()===-540&&RESET_H===4)ok("日替わり4時",dayLabel("2026-10-15T03:59:00+09:00")===dayLabel("2026-10-14T12:00:00+09:00")&&dayLabel("2026-10-15T04:00:00+09:00")!==dayLabel("2026-10-14T12:00:00+09:00"));
+  ok("cleanSeasons: 不正行を除外",cleanSeasons([{n:"13",from:"2027-02-01T00:00:00+09:00"},{n:0,from:"x"}]).length===1);
+  const mk=(x,w,l)=>[...Array(w).fill("WIN"),...Array(l).fill("LOSE")].map(res=>({a:[x,"","","","",""],r:res,t:"2026-10-01T00:00:00Z"}));
+  const ds=H.ds;H.ds="rate";const g=defGroups([...mk("x",1,0),...mk("y",18,2)]);H.ds=ds;
+  ok("防衛の勝率順: 1戦1勝より18勝2敗が上",g[0].a[0]==="y");
+  r.push(...STX);console.log(r.join("\n"));toast("selftest: FAIL "+r.filter(x=>x[0]==="F").length+"件(コンソール参照)");
+}
+if(/[?&]selftest/.test(location.search))selfTest();
+/* 古い版が残らないよう、復帰時と1時間ごとに更新を確認し、新しい版が有効になったら再読込を案内する */
+if("serviceWorker"in navigator)addEventListener("load",()=>{
+  const had=!!navigator.serviceWorker.controller;
+  navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(reg=>{
+    const chk=()=>reg.update().catch(e=>warn("sw update",e));
+    document.addEventListener("visibilitychange",()=>{if(!document.hidden)chk()});setInterval(chk,36e5);
+  }).catch(e=>warn("sw",e));
+  navigator.serviceWorker.addEventListener("controllerchange",()=>{if(had)toast("新しいバージョンが利用できます",false,{label:"再読込",fn:()=>location.reload()},30000)});
+});
 </script></body></html>
