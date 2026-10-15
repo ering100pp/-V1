@@ -108,17 +108,17 @@ details.at summary{cursor:pointer;font-size:12px;font-weight:700;color:var(--ac)
 details.at summary::-webkit-details-marker{display:none}
 details.at summary::before{content:"▸ "}
 details.at[open] summary::before{content:"▾ "}
-.rc .fm,#hf{grid-template-columns:repeat(6,44px);gap:4px;justify-content:start}
-.rc .fm{margin-top:4px}
-.rc .fm .nm,#hf .nm{font-size:9px;min-height:2.4em;margin-top:2px}
-.rc .fm .pos,#hf .pos{font-size:7px;padding:0 2px}
-.rc .fm .sq,#hf .sq{border-radius:6px}
 details.at summary{padding:2px 0 0}
-.rc{padding:6px 10px;margin-bottom:6px}
 .seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px}
 .seg button{padding:10px;border:2px solid var(--bd);border-radius:10px;background:var(--card);color:var(--fg);font-weight:800;font-size:15px}
 .seg button.on{background:var(--ac);border-color:var(--ac);color:#fff}
 .ar{border-top:1px solid var(--bd);margin-top:6px;padding-top:6px}
+@media(min-width:900px){
+#sh{align-items:center;justify-content:center}
+.sc{width:min(760px,92vw);max-height:82vh;border-radius:16px}
+.plist{display:grid;grid-template-columns:1fr 1fr}
+#nv{padding-left:calc((100% - 720px)/2);padding-right:calc((100% - 720px)/2)}
+}
 :focus-visible{outline:2px solid var(--ac);outline-offset:2px}
 button,.chip,.rb{touch-action:manipulation}
 .chip{padding:9px 13px}.del{padding:9px 12px;margin-left:8px}
@@ -135,9 +135,9 @@ button,.chip,.rb{touch-action:manipulation}
   <div id="eb" class="eb" hidden><span>記録を編集中</span><button id="ebx">やめる</button></div>
   <div class="card">
     <div style="position:relative"><div class="btn out">スクショから読み取る</div>
-    <input type="file" id="shot" accept="image/*" aria-label="戦闘履歴のスクショを選ぶ" style="position:absolute;left:0;top:0;width:100%;height:100%;opacity:0;font-size:16px"></div>
+    <input type="file" id="shot" accept="image/*" multiple aria-label="戦闘履歴のスクショを選ぶ" style="position:absolute;left:0;top:0;width:100%;height:100%;opacity:0;font-size:16px"></div>
     <p id="rst" class="mut" style="margin:6px 0 0"></p>
-    <div class="chips"><button class="chip warn" id="mq" hidden></button></div>
+    <div class="chips"><button class="chip warn" id="mq" hidden></button><button class="chip" id="qs" hidden></button><button class="chip" id="qx" hidden>残りをやめる</button></div>
   </div>
   <div class="card">
     <div class="res"><button class="rb" data-r="WIN">WIN</button><button class="rb" data-r="LOSE">LOSE</button></div>
@@ -303,7 +303,7 @@ async function loadRecords(){
   return true;
 }
 let csBase="";
-const VER="v19";
+const VER="v20";
 const drawCS=()=>{const n=Q.get().length;$("#cs").textContent=csBase+" ["+VER+"]"+(n?(csBase?" / ":"")+`未送信${n}件`:"")};
 const setCS=t=>{csBase=t;drawCS()};
 async function flushQ(){
@@ -453,7 +453,7 @@ function drawForm(force){
   {const ae=document.activeElement;if(force||!(ae&&ae.closest&&ae.closest("#pn")))drawNames()}$("#m").value=F.m;
   document.querySelectorAll(".rb").forEach(b=>b.classList.toggle("on",b.dataset.r===F.r));
   $("#eb").hidden=editId==null;
-  $("#mq").hidden=!MISS.size;$("#mq").textContent=`未認識の枠を順に入力(残り${MISS.size})`;
+  $("#qs").hidden=$("#qx").hidden=!PQ.length;$("#qs").textContent=`この画像をスキップ(残り${PQ.length}枚)`;$("#mq").hidden=!MISS.size;$("#mq").textContent=`未認識の枠を順に入力(残り${MISS.size})`;
   $("#ct").textContent="連続入力: "+(S.cont?"ON":"OFF");
 }
 function boardClick(e){
@@ -514,6 +514,7 @@ async function saveRec(){
   drawForm();refreshDL();renderHist();
   $("#msg").textContent=queued?"通信できないため端末に一時保存しました。接続したら自動で送信します":was?"更新しました":"保存しました";
   if(warn)$("#msg").textContent+=" "+warn;
+  if(!was&&PQ.length)await nextShot();
 }
 function startEdit(id){
   const r=byId(id);if(!r)return;
@@ -581,20 +582,25 @@ async function matchAll(im){
   }
   return out;
 }
+let PQ=[],PN=0;
 async function recog(){
-  const f=$("#shot").files[0],st=$("#rst");if(!f)return;
-  if(!TPL.length){st.textContent="アイコン辞書が空です。右上の「再読込」でサーバーから取得してください";$("#shot").value="";return}
-  if((F.a.some(Boolean)||F.d.some(Boolean))&&!confirm("入力済みの編成を、読み取り結果で置き換えます。よろしいですか?")){$("#shot").value="";return}
-  st.textContent="読み取り中";
+  const fs=[...$("#shot").files],st=$("#rst");$("#shot").value="";if(!fs.length)return;
+  if(!TPL.length){st.textContent="アイコン辞書が空です。右上の「再読込」でサーバーから取得してください";return}
+  if((F.a.some(Boolean)||F.d.some(Boolean))&&!confirm("入力済みの編成を、読み取り結果で置き換えます。よろしいですか?"))return;
+  PQ=fs;PN=fs.length;await nextShot();
+}
+async function nextShot(){
+  const f=PQ.shift(),st=$("#rst");if(!f){drawForm();return}
+  const pf=PN>1?`(${PN-PQ.length}/${PN}枚目)`:"";
+  st.textContent=pf+"読み取り中";if(PN>1)window.scrollTo(0,0);
   try{
     const im=await imgData(f),m=await matchAll(im),r=judge(im),ro=roleOf(im);NF=nameFeat(im,0,0);const nm=nameMatch(im);
     F.a=m.slice(0,6).map(x=>x.n);F.d=m.slice(6).map(x=>x.n);F.g={0:"",4:"",5:""};F.ga={0:"",4:"",5:""};
     MISS=new Set();CAND={};AMB=new Set();HQ=[];m.forEach((x,i)=>{const k=i<6?"a"+i:"d"+(i-6);CAND[k]=x.c;if(!x.n)MISS.add(k);else if(isH(x.n)){HQ.push(k);AMB.add(k)}else if(x.m<0.03)AMB.add(k)});
     if(r)F.r=r;if(ro!=null){F.o=ro;if(editId==null){S.role=ro;saveLocal()}}if(nm)F.n=nm.n;drawForm();if(HQ.length){const k=HQ.shift();askH(k[0],+k[1])}
     const ok=m.length-MISS.size,nt=(ro==null?"":`【${ro==="D"?"防衛":"攻撃"}】`)+(nm?`相手「${nm.n}」を自動入力。`:"");
-    st.textContent=nt+`${ok}/12枠を読み取りました`+(r?`(${r})`:"(勝敗は判別できませんでした)")+(MISS.size?`。黄色の枠が未認識です(しきい値 ${S.th})`:"。確認して保存してください")+(AMB.size?`。他に${AMB.size}枠が似たアイコンと僅差です(黄色)。枠をタップすると上位候補が出ます`:"");
-  }catch(e){st.textContent="読み取りに失敗しました: "+(e&&e.message||"")}
-  $("#shot").value="";
+    st.textContent=pf+nt+`${ok}/12枠を読み取りました`+(r?`(${r})`:"(勝敗は判別できませんでした)")+(MISS.size?`。黄色の枠が未認識です(しきい値 ${S.th})`:"。確認して保存してください")+(AMB.size?`。他に${AMB.size}枠が似たアイコンと僅差です(黄色)。枠をタップすると上位候補が出ます`:"");
+  }catch(e){st.textContent=pf+"読み取りに失敗しました: "+(e&&e.message||"");drawForm()}
 }
 
 /* 履歴 */
@@ -739,6 +745,8 @@ document.querySelectorAll(".rb").forEach(b=>b.onclick=()=>{F.r=F.r===b.dataset.r
 $("#m").oninput=e=>F.m=e.target.value;
 $("#ca").onclick=()=>{F.a=Array(6).fill("");F.ga={0:"",4:"",5:""};for(let i=0;i<6;i++)MISS.delete("a"+i);drawForm()};
 $("#cd").onclick=()=>{F.d=Array(6).fill("");F.g={0:"",4:"",5:""};for(let i=0;i<6;i++)MISS.delete("d"+i);drawForm()};
+$("#qs").onclick=async()=>{if(!PQ.length)return;F=fresh();MISS=new Set();CAND={};AMB=new Set();HQ=[];editId=null;await nextShot()};
+$("#qx").onclick=()=>{PQ=[];PN=0;drawForm();$("#rst").textContent="残りの読み取りをやめました"};
 $("#sv").onclick=saveRec;$("#shot").onchange=recog;
 $("#ct").onclick=()=>{S.cont=!S.cont;saveLocal();drawForm()};
 $("#mq").onclick=()=>{const k=[...MISS][0];if(k){chain=true;openSheet(k[0],+k[1])}};
@@ -749,6 +757,7 @@ $("#sl").onclick=e=>{const b=e.target.closest("[data-p]");if(b)pick(b.dataset.p)
 $("#sok").onclick=()=>{const x=hw($("#sq").value);if(x)pick(x)};
 $("#sem").onclick=()=>pick("");
 $("#shx").onclick=()=>{chain=false;HQ=[];$("#sh").hidden=true};
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("#sh").hidden){chain=false;HQ=[];$("#sh").hidden=true}});
 $("#sh").onclick=e=>{if(e.target.id==="sh"){chain=false;HQ=[];$("#sh").hidden=true}};
 $("#sun").onclick=()=>{SHOWALL=!SHOWALL;drawSheet()};
 $("#hq").oninput=e=>{H.q=e.target.value;H.lim=30;renderHist()};
