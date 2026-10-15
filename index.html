@@ -2,9 +2,9 @@
 <html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>戦術対抗戦ログ</title>
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0e8fa8"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="戦術ログ">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0e8fa8"><meta name="color-scheme" content="light dark"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="戦術ログ">
 <style>
-:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);--bg:#eef3f5;--card:#fff;--fg:#17222b;--mut:#6a7a86;--bd:#d3dde3;--ac:#0e8fa8;--sub:#e1eaee;--w:#1a8a4a;--l:#c0392b;--warn:#e0a000}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);--bg:#eef3f5;--card:#fff;--fg:#17222b;--mut:#5a6a76;--bd:#d3dde3;--ac:#0b7a91;--sub:#e1eaee;--w:#1a8a4a;--l:#c0392b;--warn:#e0a000}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1519;--card:#192229;--fg:#e6eef2;--mut:#8da0ac;--bd:#2e3d47;--ac:#2bb3cf;--sub:#222f37;--w:#4cc27a;--l:#ef7a6c}}
 :root[data-theme="dark"]{--bg:#0f1519;--card:#192229;--fg:#e6eef2;--mut:#8da0ac;--bd:#2e3d47;--ac:#2bb3cf;--sub:#222f37;--w:#4cc27a;--l:#ef7a6c}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
@@ -108,17 +108,23 @@ details.at summary{cursor:pointer;font-size:12px;font-weight:700;color:var(--ac)
 details.at summary::-webkit-details-marker{display:none}
 details.at summary::before{content:"▸ "}
 details.at[open] summary::before{content:"▾ "}
+.rc .fm,#hf{grid-template-columns:repeat(6,44px);gap:4px;justify-content:start}
+.rc .fm{margin-top:4px}
+.rc .fm .nm,#hf .nm{font-size:9px;min-height:2.4em;margin-top:2px}
+.rc .fm .pos,#hf .pos{font-size:7px;padding:0 2px}
+.rc .fm .sq,#hf .sq{border-radius:6px}
 details.at summary{padding:2px 0 0}
+.rc{padding:6px 10px;margin-bottom:6px}
 .seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px}
 .seg button{padding:10px;border:2px solid var(--bd);border-radius:10px;background:var(--card);color:var(--fg);font-weight:800;font-size:15px}
 .seg button.on{background:var(--ac);border-color:var(--ac);color:#fff}
 .ar{border-top:1px solid var(--bd);margin-top:6px;padding-top:6px}
-@media(min-width:900px){
-#sh{align-items:center;justify-content:center}
-.sc{width:min(760px,92vw);max-height:82vh;border-radius:16px}
-.plist{display:grid;grid-template-columns:1fr 1fr}
-#nv{padding-left:calc((100% - 720px)/2);padding-right:calc((100% - 720px)/2)}
-}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+button,.chip,.rb{touch-action:manipulation}
+.chip{padding:9px 13px}.del{padding:9px 12px;margin-left:8px}
+.act{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
+.sc{overscroll-behavior:contain}
+#sv{position:sticky;bottom:calc(64px + env(safe-area-inset-bottom,0px));z-index:4}
 </style></head><body>
 <div class="wrap">
 <div class="hd"><h1>戦術対抗戦ログ <span class="sbd" id="sbd"></span></h1><div style="display:flex;gap:6px"><button class="chip" id="rl">再読込</button><button class="chip" id="th">テーマ</button></div></div>
@@ -129,9 +135,9 @@ details.at summary{padding:2px 0 0}
   <div id="eb" class="eb" hidden><span>記録を編集中</span><button id="ebx">やめる</button></div>
   <div class="card">
     <div style="position:relative"><div class="btn out">スクショから読み取る</div>
-    <input type="file" id="shot" accept="image/*" multiple aria-label="戦闘履歴のスクショを選ぶ" style="position:absolute;left:0;top:0;width:100%;height:100%;opacity:0;font-size:16px"></div>
+    <input type="file" id="shot" accept="image/*" aria-label="戦闘履歴のスクショを選ぶ" style="position:absolute;left:0;top:0;width:100%;height:100%;opacity:0;font-size:16px"></div>
     <p id="rst" class="mut" style="margin:6px 0 0"></p>
-    <div class="chips"><button class="chip warn" id="mq" hidden></button><button class="chip" id="qs" hidden></button><button class="chip" id="qx" hidden>残りをやめる</button></div>
+    <div class="chips"><button class="chip warn" id="mq" hidden></button></div>
   </div>
   <div class="card">
     <div class="res"><button class="rb" data-r="WIN">WIN</button><button class="rb" data-r="LOSE">LOSE</button></div>
@@ -163,6 +169,8 @@ details.at summary{padding:2px 0 0}
 </section>
 
 <section id="st" hidden>
+  <h1 id="sth" style="user-select:none">設定</h1>
+  <div class="card" id="kc" hidden><label for="ki" style="margin-top:0">管理キー</label><input id="ki" type="password" autocomplete="off" placeholder="キーを入力"><button class="btn" id="ks" style="margin-top:8px">保存</button><button class="btn out" id="kx" style="margin-top:8px">この端末のキーを消す</button></div>
   <div class="card">
     <label for="oq" style="margin-top:0">プレーヤー名の候補(1行に1名)</label>
     <textarea id="oq" rows="10"></textarea>
@@ -210,7 +218,7 @@ details.at summary{padding:2px 0 0}
 <div id="ts" hidden></div>
 <nav id="nv"><button class="on" data-t="in">記録</button><button data-t="hs">履歴</button><button data-t="st">設定</button></nav>
 
-<div id="sh" hidden><div class="sc">
+<div id="sh" hidden><div class="sc" role="dialog" aria-modal="true">
   <div class="sht"><b id="sht"></b><button id="shx" aria-label="閉じる">×</button></div>
   <input id="sq" placeholder="生徒名を入力して絞り込み" autocomplete="off">
   <div class="chips" id="shb"><button class="chip" id="sok">入力した名前で決定</button><button class="chip" id="sem">空にする</button><button class="chip" id="sun">未使用も表示</button></div>
@@ -219,8 +227,9 @@ details.at summary{padding:2px 0 0}
 
 <script>
 const $=s=>document.querySelector(s);
+const hw=n=>String(n??"").replace(/[\uFF01-\uFF5E]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0)).replace(/\u3000/g," ").trim();
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const NM=["STR1","STR2","STR3","STR4","SP1","SP2"],IDX=[0,1,2,3,4,5],GK=[0,4,5];
+const NM=["STR1","STR2","STR3","STR4","SP1","SP2"],IDX=[0,1,2,3,4,5];
 const GR=["★3","★4","固1","固2","固3","固4"];
 /* ホシノ(臨戦): モードチェンジで1番・2番がある。記録では別名、絞り込みと集計では1つにまとめる。1番・2番の専用アイコンは表示専用で、スクショ読み取りには使わない */
 const HB="ホシノ(臨戦)",H1=HB+"1",H2=HB+"2",HD=new Set([H1,H2]);
@@ -231,6 +240,7 @@ const hk=()=>{const t=TPL.find(x=>hw(x.base)===HB&&x.k);return t?t.k:"st"};
 const API_BASE="https://tactics-log-db.kida-ken-1002.workers.dev";
 /* 書き込み用キー。HTMLには書かず、設定タブで入力した値をこの端末に保存 */
 let KEY="";try{KEY=localStorage.getItem("bat-key")||""}catch(e){}
+if(location.hash.startsWith("#key=")){KEY=decodeURIComponent(location.hash.slice(5)).trim();try{localStorage.setItem("bat-key",KEY)}catch(e){}history.replaceState(null,"",location.pathname+location.search)}
 /* S: records/students/growth/th はサーバー由来。players/cont はこの端末だけの設定 */
 let S={records:[],st:[],sp:[],growth:GR.slice(),th:0.75,players:[],me:"",season:"",role:"",cpl:[],cont:false};
 const blank=()=>({n:"",me:"",r:"",s:"",o:"",d:Array(6).fill(""),g:{0:"",4:"",5:""},p:"",a:Array(6).fill(""),ga:{0:"",4:"",5:""},m:""});
@@ -242,12 +252,12 @@ const byId=id=>S.records.find(r=>String(r.id)===String(id));
 let F=blank(),editId=null,cur=null,MISS=new Set(),chain=false,CAND={},AMB=new Set();
 
 /* 端末内の保存(プレーヤー名の候補・連続入力・キャッシュのみ) */
-const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){try{toast("端末の保存容量が不足しています(キャッシュを更新できません)")}catch(_){}return false}}};
 const saveLocal=()=>LS.set("bat-local",{players:S.players,me:S.me,season:S.season,role:S.role,ct:S.cont});
 const cacheSet=(k,v)=>{const c=LS.get("bat-cache",{});c[k]=v;LS.set("bat-cache",c)};
 const Q={get:()=>LS.get("bat-q",[]),set:v=>LS.set("bat-q",v)};
 const isNet=e=>e&&(e.name==="AbortError"||e instanceof TypeError);
-let flushing=false;
+let flushing=false,SSU=null,LLT=0,ROLE=LS.get("bat-role",KEY?"admin":"");
 
 /* サーバー通信 */
 async function api(method,path,body){
@@ -258,6 +268,7 @@ async function api(method,path,body){
       const j=await r.json().catch(()=>null),w=j&&j.reason;
       throw new Error(w==="no_secret"?"Workerに APP_KEY が設定されていません(Cloudflareで登録して、デプロイしてください)":w==="no_key"?"この端末にキーがありません":w==="mismatch"?"キーがWorkerの APP_KEY と一致しません":"キーが違います(Workerが古い可能性。最新のworker.jsをデプロイしてください)");
     }
+    if(r.status===409)throw new Error("他の端末で先に更新されています。再読込してから編集し直してください");
     if(!r.ok)throw new Error("HTTP "+r.status);
     return r.status===204?null:await r.json().catch(()=>null);
   }finally{clearTimeout(tm)}
@@ -276,9 +287,23 @@ function setRecords(v){
   if(!Array.isArray(a))throw new Error("形式が違います");
   S.records=a.map(normRec);cacheSet("records",S.records);
 }
-async function loadRecords(){try{setRecords(await api("GET","/records"))}catch(e){return false}return true}
+async function loadRecords(){
+  try{
+    const sv=LS.get("bat-since","");
+    if(sv&&S.records.length){
+      const a=await api("GET","/records?since="+encodeURIComponent(sv));
+      if(!Array.isArray(a))throw new Error("形式が違います");
+      const m=new Map(S.records.map(x=>[String(x.id),x]));
+      for(const x of a)x.deleted?m.delete(String(x.id)):m.set(String(x.id),normRec(x));
+      S.records=[...m.values()];cacheSet("records",S.records);
+    }else setRecords(await api("GET","/records"));
+    const mx=S.records.reduce((q,x)=>x.u&&x.u>q?x.u:q,"");if(mx)LS.set("bat-since",mx);
+    LLT=Date.now();
+  }catch(e){return false}
+  return true;
+}
 let csBase="";
-const VER="v17";
+const VER="v19";
 const drawCS=()=>{const n=Q.get().length;$("#cs").textContent=csBase+" ["+VER+"]"+(n?(csBase?" / ":"")+`未送信${n}件`:"")};
 const setCS=t=>{csBase=t;drawCS()};
 async function flushQ(){
@@ -296,13 +321,15 @@ async function flushQ(){
 let syncing=false;
 async function syncAll(){
   if(syncing)return;syncing=true;setCS("サーバーと同期中…");
-  const [c,i,r]=await Promise.allSettled([api("GET","/config"),api("GET","/icons"),api("GET","/records")]);
+  const [c,i,r,me]=await Promise.allSettled([api("GET","/config"),api("GET","/icons"),api("GET","/records"),api("GET","/me")]);
+  if(me.status==="fulfilled"&&me.value)ROLE=me.value.role||"";else if(me.reason&&/404/.test(me.reason.message))ROLE=KEY?"admin":"";else if(me.reason&&/キー/.test(me.reason.message))ROLE="";
+  LS.set("bat-role",ROLE);
   const errs=[];
   if(c.status==="fulfilled"&&c.value){applyConfig(c.value);cacheSet("config",c.value)}else errs.push("設定");
-  if(i.status==="fulfilled"){let j=i.value;if(j&&!Array.isArray(j))j=j.icons;if(Array.isArray(j)){rebuild(j);LS.set("bai-cache",j)}else errs.push("アイコン")}else errs.push("アイコン");
+  if(i.status==="fulfilled"){let j=i.value;if(j&&!Array.isArray(j))j=j.icons;if(Array.isArray(j)){rebuild(j);LS.set("bai-cache",j.map(x=>({n:x.n,k:x.k,d:x.d})))}else errs.push("アイコン")}else errs.push("アイコン");
   if(r.status==="fulfilled"){try{setRecords(r.value)}catch(e){errs.push("記録")}}else errs.push("記録");
   setCS(errs.length?`同期に失敗: ${errs.join("・")}(保存済みのデータを表示中。再読込できます)`:`同期済み: 記録${S.records.length}件・アイコン${TPL.length}件`);
-  syncing=false;drawForm();refreshDL();renderHist();if(KEY)fillAdm();
+  syncing=false;drawForm();refreshDL();renderHist();applyMode();
 }
 
 /* アイコン照合の共通処理(特徴量: 各枠を16x16に区切ったRGB平均 = 768バイト) */
@@ -358,8 +385,8 @@ function roleOf(im){
 let TPL=[];
 const unb64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
 function rebuild(list){
-  const t=[];
-  for(const x of list||[]){try{if(!x||!x.n||!x.d)continue;const f=unb64(x.d);if(f.length!==FN*FN*3)continue;t.push({th:x.th||LS.get("bat-thumbs",{})[x.n]||"",n:x.n,base:x.n.replace(/#\d+$/,""),z:norm(f),g:norm(gradF(f)),k:x.k,f,d:x.d})}catch(e){}}
+  const t=[],TH=LS.get("bat-thumbs",{});
+  for(const x of list||[]){try{if(!x||!x.n||!x.d)continue;const f=unb64(x.d);if(f.length!==FN*FN*3)continue;t.push({th:x.th||TH[x.n]||"",n:x.n,base:x.n.replace(/#\d+$/,""),z:norm(f),g:norm(gradF(f)),k:x.k,f,d:x.d})}catch(e){}}
   TPL=t;
 }
 
@@ -388,16 +415,13 @@ function learn(rec){
 }
 
 /* 入力 */
-function gsel(attr,cv,label){
-  const o=["",...S.growth];if(cv&&!o.includes(cv))o.push(cv);
-  return `<select class="gr" ${attr} aria-label="${label}">${o.map(x=>`<option value="${esc(x)}"${x===cv?" selected":""}>${x?esc(x):"育成度"}</option>`).join("")}</select>`;
-}
-const growthSel=(side,i)=>gsel(`data-g="${side}${i}"`,F[GF(side)][i],`${side==="d"?"防衛":"攻撃"} ${NM[i]}の育成度`);
+const TU=new Map();
+const tu=s=>{if(!s||s.slice(0,5)!=="data:")return s;let u=TU.get(s);if(!u){try{const i=s.indexOf(","),b=atob(s.slice(i+1)),a=new Uint8Array(b.length);for(let j=0;j<b.length;j++)a[j]=b.charCodeAt(j);u=URL.createObjectURL(new Blob([a],{type:s.slice(5,s.indexOf(";"))}))}catch(e){u=s}TU.set(s,u)}return u};
 function iconTh(n){
   if(!n)return"";
   const t=TPL.find(x=>x.n===n)||TPL.find(x=>x.base===n)||(HD.has(n)?TPL.find(x=>x.base===HB):null);
   if(!t)return"";
-  if(t.th)return t.th;
+  if(t.th)return tu(t.th);
   if(!t.t2){const c=document.createElement("canvas");c.width=16;c.height=16;const x=c.getContext("2d"),id=x.createImageData(16,16);for(let p=0;p<256;p++){id.data[p*4]=t.f[p*3];id.data[p*4+1]=t.f[p*3+1];id.data[p*4+2]=t.f[p*3+2];id.data[p*4+3]=255}x.putImageData(id,0,0);t.t2=c.toDataURL()}
   return t.t2;
 }
@@ -414,9 +438,9 @@ $("#in").addEventListener("change",e=>{
   const s=e.target.closest("[data-nk]");
   if(s){if(s.value==="__new"){const i=$(`[data-nn="${s.dataset.nk}"]`);i.hidden=false;i.focus()}else{F[s.dataset.nk]=s.value;if(s.dataset.nk==="me"&&editId==null){S.me=s.value;saveLocal()}}return}
   const t=e.target.closest("[data-nn]");
-  if(t){const v=t.value.trim();if(v){if(!S.players.includes(v)){S.players.push(v);saveLocal()}F[t.dataset.nn]=v;if(t.dataset.nn==="me"&&editId==null){S.me=v;saveLocal()}drawForm();refreshDL()}}
+  if(t){const v=t.value.trim();if(v){if(!S.players.includes(v)){S.players.push(v);saveLocal()}F[t.dataset.nn]=v;if(t.dataset.nn==="me"&&editId==null){S.me=v;saveLocal()}drawForm(true);refreshDL()}}
 });
-function drawForm(){
+function drawForm(force){
   for(const k of[...MISS])if(F[k[0]][+k[1]])MISS.delete(k);
   $("#bd").innerHTML=IDX.map(i=>slot("d",i)).join("");
   $("#ba").innerHTML=IDX.map(i=>slot("a",i)).join("");
@@ -426,10 +450,10 @@ function drawForm(){
   $("#cd").textContent=df?"相手の攻撃編成をクリア":"防衛編成をクリア";
   $("#ca").textContent=df?"防衛編成をクリア":"攻撃編成をクリア";
   document.querySelectorAll("#ro button").forEach(b=>b.classList.toggle("on",(b.dataset.o||"")===(F.o||"")));
-  drawNames();$("#m").value=F.m;
+  {const ae=document.activeElement;if(force||!(ae&&ae.closest&&ae.closest("#pn")))drawNames()}$("#m").value=F.m;
   document.querySelectorAll(".rb").forEach(b=>b.classList.toggle("on",b.dataset.r===F.r));
   $("#eb").hidden=editId==null;
-  $("#qs").hidden=$("#qx").hidden=!PQ.length;$("#qs").textContent=`この画像をスキップ(残り${PQ.length}枚)`;$("#mq").hidden=!MISS.size;$("#mq").textContent=`未認識の枠を順に入力(残り${MISS.size})`;
+  $("#mq").hidden=!MISS.size;$("#mq").textContent=`未認識の枠を順に入力(残り${MISS.size})`;
   $("#ct").textContent="連続入力: "+(S.cont?"ON":"OFF");
 }
 function boardClick(e){
@@ -470,16 +494,19 @@ function pick(x){
 }
 async function saveRec(){
   if(!F.n&&!F.d.some(Boolean)&&!F.a.some(Boolean)){$("#msg").textContent="何か入力してください";return}
+  if(editId==null&&!F.r&&!confirm("勝敗が未選択です。このまま保存しますか?"))return;
+  const dp=a=>{const q=a.filter(Boolean).map(grp);return q.length!==new Set(q).size};
+  if((dp(F.d)||dp(F.a))&&!confirm("同じ生徒が重複する編成があります。このまま保存しますか?"))return;
   const was=editId!=null,rec=JSON.parse(JSON.stringify(F));delete rec.id;
   if(!was){const sg=x=>JSON.stringify([x.n,x.r,x.d,x.a,x.o]),k=sg(rec);
     if(S.records.some(x=>Date.now()-(+new Date(x.t)||0)<6e5&&sg(x)===k)&&!confirm("10分以内に同じ内容の記録があります。重複かもしれません。それでも保存しますか?"))return}
   const btn=$("#sv");btn.disabled=true;$("#msg").textContent="保存中…";let queued=false;
   try{
     if(was){const old=byId(editId);rec.t=(old&&old.t)||new Date().toISOString();await api("PUT","/records/"+encodeURIComponent(editId),rec)}
-    else{rec.t=new Date().toISOString();await api("POST","/records",rec)}
+    else{rec.t=new Date().toISOString();rec.cid=crypto.randomUUID?crypto.randomUUID():undefined;await api("POST","/records",rec)}
   }catch(e){if(!was&&isNet(e)){Q.set([...Q.get(),rec]);queued=true;drawCS()}else{$("#msg").textContent="保存に失敗しました(入力は残してあります): "+(e&&e.message||"");btn.disabled=false;return}}
   btn.disabled=false;
-  learn(rec);if(!was)learnName(rec);
+  learn(rec);if(!was)learnName(rec);NF=null;
   const a=F.a.slice(),ga={...F.ga};F=fresh();MISS=new Set();CAND={};AMB=new Set();editId=null;
   if(!was&&S.cont){F.a=a;F.ga=ga}
   await loadRecords();
@@ -487,7 +514,6 @@ async function saveRec(){
   drawForm();refreshDL();renderHist();
   $("#msg").textContent=queued?"通信できないため端末に一時保存しました。接続したら自動で送信します":was?"更新しました":"保存しました";
   if(warn)$("#msg").textContent+=" "+warn;
-  if(!was&&PQ.length)await nextShot();
 }
 function startEdit(id){
   const r=byId(id);if(!r)return;
@@ -519,17 +545,17 @@ function nameMatch(im){
   }catch(e){return null}
 }
 function learnName(rec){
-  if(!NF||!rec.n)return;
+  if(!NF||!rec.n){NF=null;return}
   const z=norm(NF),mine=NAMES.filter(t=>t.n===rec.n);
   if(mine.some(t=>sim(z,norm(unb64(t.d)))>0.97)){NF=null;return}
   if(mine.length>=3)NAMES.splice(NAMES.indexOf(mine[0]),1);
   NAMES.push({n:rec.n,d:b64(NF)});LS.set("bat-names",NAMES);NF=null;
 }
 /* スクショ読み取り(アイコン照合。AIは使わない) */
-async function imgData(f){const b=await createImageBitmap(f),c=document.createElement("canvas");c.width=b.width;c.height=b.height;const x=c.getContext("2d",{willReadFrequently:true});x.drawImage(b,0,0);return x.getImageData(0,0,b.width,b.height)}
-function matchAll(im){
+async function imgData(f){const b=await createImageBitmap(f),c=document.createElement("canvas");c.width=b.width;c.height=b.height;const x=c.getContext("2d",{willReadFrequently:true});x.drawImage(b,0,0);const d=x.getImageData(0,0,b.width,b.height);b.close&&b.close();return d}
+async function matchAll(im){
   const th=S.th,LOW=0.5,MG=0.1,sc=[];
-  SX.forEach((_,i)=>{
+  for(let i=0;i<SX.length;i++){await new Promise(r=>setTimeout(r));
     const b=slotBox(im.width,im.height,i),kd=(i%6)<4?"st":"sp",zs=[];
     for(const dy of SH4)for(const dx of SH4){const f=feat(im,{...b,x:b.x+dx,y:b.y+dy});zs.push([norm(f),norm(gradF(f))])}
     const bm={};
@@ -539,7 +565,7 @@ function matchAll(im){
       if(!(t.base in bm)||s>bm[t.base])bm[t.base]=s;
     }
     sc[i]=Object.entries(bm).map(([n,s])=>({n,s})).sort((a,b)=>b.s-a.s);
-  });
+  }
   /* 同じチームに同じ生徒は入らないので、スコアの高い枠から順に割り当てる */
   const out=sc.map(l=>({n:"",s:-1,b:"",c:l.slice(0,3).map(x=>x.n),m:1}));
   for(const side of[0,6]){
@@ -555,25 +581,20 @@ function matchAll(im){
   }
   return out;
 }
-let PQ=[],PN=0;
 async function recog(){
-  const fs=[...$("#shot").files],st=$("#rst");$("#shot").value="";if(!fs.length)return;
-  if(!TPL.length){st.textContent="アイコン辞書が空です。右上の「再読込」でサーバーから取得してください";return}
-  if((F.a.some(Boolean)||F.d.some(Boolean))&&!confirm("入力済みの編成を、読み取り結果で置き換えます。よろしいですか?"))return;
-  PQ=fs;PN=fs.length;await nextShot();
-}
-async function nextShot(){
-  const f=PQ.shift(),st=$("#rst");if(!f){drawForm();return}
-  const pf=PN>1?`(${PN-PQ.length}/${PN}枚目)`:"";
-  st.textContent=pf+"読み取り中";if(PN>1)window.scrollTo(0,0);
+  const f=$("#shot").files[0],st=$("#rst");if(!f)return;
+  if(!TPL.length){st.textContent="アイコン辞書が空です。右上の「再読込」でサーバーから取得してください";$("#shot").value="";return}
+  if((F.a.some(Boolean)||F.d.some(Boolean))&&!confirm("入力済みの編成を、読み取り結果で置き換えます。よろしいですか?")){$("#shot").value="";return}
+  st.textContent="読み取り中";
   try{
-    const im=await imgData(f),m=matchAll(im),r=judge(im),ro=roleOf(im);NF=nameFeat(im,0,0);const nm=nameMatch(im);
+    const im=await imgData(f),m=await matchAll(im),r=judge(im),ro=roleOf(im);NF=nameFeat(im,0,0);const nm=nameMatch(im);
     F.a=m.slice(0,6).map(x=>x.n);F.d=m.slice(6).map(x=>x.n);F.g={0:"",4:"",5:""};F.ga={0:"",4:"",5:""};
     MISS=new Set();CAND={};AMB=new Set();HQ=[];m.forEach((x,i)=>{const k=i<6?"a"+i:"d"+(i-6);CAND[k]=x.c;if(!x.n)MISS.add(k);else if(isH(x.n)){HQ.push(k);AMB.add(k)}else if(x.m<0.03)AMB.add(k)});
     if(r)F.r=r;if(ro!=null){F.o=ro;if(editId==null){S.role=ro;saveLocal()}}if(nm)F.n=nm.n;drawForm();if(HQ.length){const k=HQ.shift();askH(k[0],+k[1])}
     const ok=m.length-MISS.size,nt=(ro==null?"":`【${ro==="D"?"防衛":"攻撃"}】`)+(nm?`相手「${nm.n}」を自動入力。`:"");
-    st.textContent=pf+nt+`${ok}/12枠を読み取りました`+(r?`(${r})`:"(勝敗は判別できませんでした)")+(MISS.size?`。黄色の枠が未認識です(しきい値 ${S.th})`:"。確認して保存してください")+(AMB.size?`。他に${AMB.size}枠が似たアイコンと僅差です(黄色)。枠をタップすると上位候補が出ます`:"");
-  }catch(e){st.textContent=pf+"読み取りに失敗しました: "+(e&&e.message||"");drawForm()}
+    st.textContent=nt+`${ok}/12枠を読み取りました`+(r?`(${r})`:"(勝敗は判別できませんでした)")+(MISS.size?`。黄色の枠が未認識です(しきい値 ${S.th})`:"。確認して保存してください")+(AMB.size?`。他に${AMB.size}枠が似たアイコンと僅差です(黄色)。枠をタップすると上位候補が出ます`:"");
+  }catch(e){st.textContent="読み取りに失敗しました: "+(e&&e.message||"")}
+  $("#shot").value="";
 }
 
 /* 履歴 */
@@ -584,7 +605,7 @@ function drawChips(){
    (H.mo==="D"?[CH("ds","rate","勝率順"),CH("ds","n","戦数順"),CH("ds","new","新しい順")]:[CH("so","new","新しい順"),CH("so","old","古い順")]).join("");
   $("#hf").innerHTML=IDX.map(k=>`<div><button data-fs="${k}" class="${H.fd[k]?"set":""}" aria-label="絞り込み ${NM[k]} ${esc(H.fd[k])||"指定なし"}"><span class="sq">${iconImg(H.fd[k]===HB?H1:H.fd[k])}<span class="pos">${NM[k]}</span>${H.fd[k]?"":"－"}</span><span class="nm">${esc(H.fd[k])||"　"}</span></button></div>`).join("");
 }
-/* 防衛編成の判定: STR1-4は枠の位置まで一致(STR1は育成度も)、SP1/SP2は生徒+育成度の組で順不同。空欄は条件なし */
+/* 防衛編成の判定: STR1-4は枠の位置まで一致(育成度は見ない)、SP1/SP2は生徒+育成度の組で順不同。空欄は条件なし */
 function defHit(d,fd){
   for(let k=0;k<4;k++)if(fd[k]&&grp(d[k])!==grp(fd[k]))return false;
   const ok=(fi,ri)=>!fd[fi]||grp(d[ri])===grp(fd[fi]);
@@ -649,7 +670,7 @@ function statsD(recs){
   if(!top.length)return `<p class="mut">集計できる記録がありません</p>`;
   return `<div class="lb">相手の攻撃に多い生徒(守りの勝敗)</div><table class="stt">${top.map(([s,o])=>`<tr><td>${esc(s)}</td><td class="r">${o.n}回</td><td class="r">${o.w}勝${o.k-o.w}敗 ${pct(o.w,o.k)}</td></tr>`).join("")}</table>`;
 }
-const pct=(w,n)=>n?Math.round(w/n*100)+"%":"－";
+const pct=(w,n)=>n?Math.round(w/n*100)+"%"+(n<5?`(n=${n})`:""):"－";
 function stats(recs){
   const dc={},ac={},oc={};
   for(const r of recs){
@@ -676,7 +697,7 @@ function renderHist(){
   rows.sort((a,b)=>{const d=(+new Date(a.t)||0)-(+new Date(b.t)||0);return H.so==="old"?d:-d});
   const w=rows.filter(r=>r.r==="WIN").length,n=rows.filter(r=>r.r).length;
   $("#sm").innerHTML=`<b>${rows.length}件</b> / 全${S.records.length}件`+(n?`　<b>${w}勝${n-w}敗・勝率${Math.round(w/n*100)}%</b>`:"");
-  $("#ss").innerHTML=H.mo==="D"?statsD(rows):stats(rows);$("#ssd").open=H.mo!=="D"&&H.fd.some(Boolean);
+  $("#ss").innerHTML=H.mo==="D"?statsD(rows):stats(rows);$("#ssd").open=H.mo!=="D"&&(SSU===null?H.fd.some(Boolean):SSU);
   if(H.mo==="D"){$("#hl").innerHTML=rows.length?defGroups(rows).map(defCard).join(""):`<p class="mut" style="text-align:center">該当する防衛の記録がありません</p>`;return}
   $("#hl").innerHTML=rows.length?dayHtml(rows)+(rows.length>H.lim?`<button class="btn out" id="mr">もっと見る(残り${rows.length-H.lim}件)</button>`:""):`<p class="mut" style="text-align:center">該当する記録がありません</p>`;
   const mr=$("#mr");if(mr&&window.IntersectionObserver){const o=new IntersectionObserver(es=>{if(es[0].isIntersecting){o.disconnect();H.lim+=30;renderHist()}},{rootMargin:"200px"});o.observe(mr)}
@@ -691,8 +712,8 @@ function toast(msg,undo){
 }
 $("#ts").onclick=async e=>{
   if(e.target.id!=="tu"||!LD)return;
-  const r={...LD};delete r.id;LD=null;
-  try{await api("POST","/records",r)}catch(err){toast("元に戻せませんでした: "+(err&&err.message||""));return}
+  const r={...LD},id0=LD.id;delete r.id;LD=null;
+  try{try{await api("POST","/records/"+encodeURIComponent(id0)+"/restore")}catch(e1){if(!/404/.test(e1.message))throw e1;await api("POST","/records",r)}}catch(err){toast("元に戻せませんでした: "+(err&&err.message||""));return}
   $("#ts").hidden=true;await loadRecords();renderHist();
 };
 
@@ -708,18 +729,16 @@ $("#th").onclick=()=>{theme=TK[(TK.indexOf(theme)+1)%3];try{localStorage.setItem
 function tab(t){
   document.querySelectorAll("#nv button").forEach(b=>b.classList.toggle("on",b.dataset.t===t));
   for(const id of["in","hs","st"])$("#"+id).hidden=id!==t;
-  if(t==="hs"){renderHist();loadRecords().then(ok=>{if(ok){refreshDL();renderHist()}})}
+  if(t==="hs"){renderHist();(Date.now()-LLT<15000?Promise.resolve(false):loadRecords()).then(ok=>{if(ok){refreshDL();renderHist()}})}
 }
 document.querySelectorAll("#nv button").forEach(b=>b.onclick=()=>tab(b.dataset.t));
-document.addEventListener("visibilitychange",()=>{if(!document.hidden&&!$("#hs").hidden)loadRecords().then(ok=>{if(ok)renderHist()})});
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&!$("#hs").hidden&&Date.now()-LLT>30000)loadRecords().then(ok=>{if(ok)renderHist()})});
 $("#rl").onclick=()=>syncAll().then(flushQ);window.addEventListener("online",flushQ);
 $("#bd").onclick=boardClick;$("#ba").onclick=boardClick;
 document.querySelectorAll(".rb").forEach(b=>b.onclick=()=>{F.r=F.r===b.dataset.r?"":b.dataset.r;drawForm()});
 $("#m").oninput=e=>F.m=e.target.value;
 $("#ca").onclick=()=>{F.a=Array(6).fill("");F.ga={0:"",4:"",5:""};for(let i=0;i<6;i++)MISS.delete("a"+i);drawForm()};
 $("#cd").onclick=()=>{F.d=Array(6).fill("");F.g={0:"",4:"",5:""};for(let i=0;i<6;i++)MISS.delete("d"+i);drawForm()};
-$("#qs").onclick=async()=>{if(!PQ.length)return;F=fresh();MISS=new Set();CAND={};AMB=new Set();HQ=[];editId=null;await nextShot()};
-$("#qx").onclick=()=>{PQ=[];PN=0;drawForm();$("#rst").textContent="残りの読み取りをやめました"};
 $("#sv").onclick=saveRec;$("#shot").onchange=recog;
 $("#ct").onclick=()=>{S.cont=!S.cont;saveLocal();drawForm()};
 $("#mq").onclick=()=>{const k=[...MISS][0];if(k){chain=true;openSheet(k[0],+k[1])}};
@@ -730,13 +749,11 @@ $("#sl").onclick=e=>{const b=e.target.closest("[data-p]");if(b)pick(b.dataset.p)
 $("#sok").onclick=()=>{const x=hw($("#sq").value);if(x)pick(x)};
 $("#sem").onclick=()=>pick("");
 $("#shx").onclick=()=>{chain=false;HQ=[];$("#sh").hidden=true};
-document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("#sh").hidden){chain=false;HQ=[];$("#sh").hidden=true}});
 $("#sh").onclick=e=>{if(e.target.id==="sh"){chain=false;HQ=[];$("#sh").hidden=true}};
 $("#sun").onclick=()=>{SHOWALL=!SHOWALL;drawSheet()};
 $("#hq").oninput=e=>{H.q=e.target.value;H.lim=30;renderHist()};
 $("#hc").onclick=e=>{const b=e.target.closest("[data-k]");if(b){H[b.dataset.k]=b.dataset.v;H.lim=30;renderHist()}};
 $("#hf").onclick=e=>{const b=e.target.closest("[data-fs]");if(b){chain=false;openSheet("f",+b.dataset.fs)}};
-$("#hf").addEventListener("change",e=>{const g=e.target.closest("[data-fg]");if(g){H.fg[+g.dataset.fg]=g.value;H.lim=30;renderHist()}});
 $("#hfc").onclick=()=>{H.q="";$("#hq").value="";setFilter(Array(6).fill(""))};
 $("#hm").onclick=e=>{const b=e.target.closest("[data-m]");if(b){H.mo=b.dataset.m;H.lim=30;renderHist();window.scrollTo(0,0)}};
 $("#ro").onclick=e=>{const b=e.target.closest("[data-o]");if(!b)return;F.o=b.dataset.o;if(editId==null){S.role=F.o;saveLocal()}drawForm()};
@@ -747,7 +764,7 @@ $("#hl").onclick=async e=>{
   if(fb){const r=byId(fb.dataset.f);if(r)setFilter(r.d,r.g);return}
   const ed=e.target.closest("[data-e]");if(ed){startEdit(ed.dataset.e);return}
   const x=e.target.closest("[data-x]");if(!x)return;
-  const id=x.dataset.x,r=byId(id);if(!r)return;
+  const id=x.dataset.x,r=byId(id);if(!r)return;if(!confirm("この記録を削除しますか?"))return;
   try{await api("DELETE","/records/"+encodeURIComponent(id))}catch(err){toast("削除に失敗しました: "+(err&&err.message||""));return}
   LD=r;
   if(editId!=null&&String(editId)===String(id)){editId=null;F=fresh();MISS=new Set();drawForm()}
@@ -756,18 +773,15 @@ $("#hl").onclick=async e=>{
 
 /* 設定(プレーヤー名の候補のみ) */
 $("#ob").onclick=()=>{
-  /* 「admin:キー」の行は管理者キーとして扱い、候補には入れない(「admin:」だけの行で解除) */
-  const ls=$("#oq").value.split("\n").map(s=>s.trim()).filter(Boolean),isK=s=>/^admin[:：]/i.test(s),ki=ls.filter(isK);
-  if(ki.length){KEY=ki[ki.length-1].slice(6).trim();try{KEY?localStorage.setItem("bat-key",KEY):localStorage.removeItem("bat-key")}catch(e){}applyMode()}
-  S.players=[...new Set(ls.filter(s=>!isK(s)))];
+  const ls=$("#oq").value.split("\n").map(s=>s.trim()).filter(Boolean);S.players=[...new Set(ls)];
   $("#oq").value=S.players.join("\n");
   saveLocal();refreshDL();drawForm();$("#om").textContent="保存しました";
 };
 
 /* 管理者: 生徒リストとアイコン辞書の編集(キーを入れた端末のみ表示) */
-const applyMode=()=>{$("#adm").hidden=!KEY;if(KEY)fillAdm()};
+const applyMode=()=>{$("#adm").hidden=!(KEY&&ROLE==="admin");if(KEY&&ROLE==="admin")fillAdm()};
 function fillAdm(){
-  $("#kinfo").textContent=`この端末に保存中のキー: ${KEY.slice(0,2)}…(${KEY.length}文字)。Workerの APP_KEY と同じか確認してください`;
+  $("#kinfo").textContent="この端末に管理キーが保存されています";
   $("#lth").value=S.th;
   $("#lst").value=S.st.join("\n");$("#lsp").value=S.sp.join("\n");
   $("#adl").innerHTML=[...new Set([...kindList("st"),...kindList("sp")])].map(x=>`<option value="${esc(x)}">`).join("");
@@ -779,7 +793,6 @@ $("#lsb").onclick=async()=>{
   $("#lsm").textContent="保存しました";syncAll();
 };
 /* 全角の英数記号(かっこ含む)と全角スペースを半角にする。かな・漢字・長音は変えない */
-const hw=n=>String(n??"").replace(/[\uFF01-\uFF5E]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0)).replace(/\u3000/g," ").trim();
 const decodeName=n=>{if(!/^[0-9A-Fa-f_]{12,}$/.test(n))return n;try{const h=n.replace(/_/g,"");if(h.length%2)return n;const b=Uint8Array.from(h.match(/../g),x=>parseInt(x,16));const t=new TextDecoder("utf-8",{fatal:true}).decode(b).replace(/\.[^.]+$/,"").replace(/^img_?/i,"").replace(/_?icon$/i,"");return t||n}catch(e){return n}};
 const sampleName=(n,ex)=>{const u=new Set([...TPL.map(t=>t.n),...ex.map(j=>j.n)]);if(!u.has(n))return n;let i=2;while(u.has(`${n}#${i}`))i++;return `${n}#${i}`};
 const thumbOf=(cv,b)=>{const t=document.createElement("canvas");t.width=72;t.height=60;t.getContext("2d").drawImage(cv,b.x,b.y,b.w,b.h,0,0,72,60);return t.toDataURL("image/jpeg",.82)};
@@ -789,7 +802,7 @@ let AD=null;
 $("#ish").onchange=async()=>{
   const f=$("#ish").files[0];if(!f)return;
   try{
-    const im=await imgData(f),m=TPL.length?matchAll(im):SX.map(()=>({n:""}));
+    const im=await imgData(f),m=TPL.length?await matchAll(im):SX.map(()=>({n:""}));
     const big=document.createElement("canvas");big.width=im.width;big.height=im.height;big.getContext("2d").putImageData(im,0,0);
     AD={fs:SX.map((_,i)=>feat(im,slotBox(im.width,im.height,i))),th:SX.map((_,i)=>thumbOf(big,slotBox(im.width,im.height,i)))};
     let h="";
@@ -864,7 +877,7 @@ function drawDL(){
   const q=($("#dq").value||"").trim().toLowerCase();
   const l=TPL.slice().sort((a,b)=>(a.k||"z").localeCompare(b.k||"z")||a.n.localeCompare(b.n,"ja")).filter(t=>!q||t.n.toLowerCase().includes(q));
   $("#dh").textContent=`登録済みアイコン(${TPL.length}件${q?`・表示${l.length}件`:""})`;
-  $("#dl").innerHTML=l.map((t,i)=>`<div class="dr" data-o="${esc(t.n)}">${t.th?`<img class="tm" src="${esc(t.th)}" alt="">`:`<canvas width="16" height="16" data-ci="${i}"></canvas>`}<div><input class="dn" value="${esc(t.n)}" aria-label="生徒名"><div class="rw"><label class="ck"><input type="checkbox" data-ck${DSEL.has(t.n)?" checked":""} aria-label="選択"></label><select class="dk" aria-label="ロール">${["st","sp",""].map(v=>`<option value="${v}"${(t.k||"")===v?" selected":""}>${v==="st"?"ST":v==="sp"?"SP":"未設定"}</option>`).join("")}</select><button class="del" data-sv>保存</button><button class="del" data-dx>削除</button></div></div></div>`).join("");
+  $("#dl").innerHTML=l.map((t,i)=>`<div class="dr" data-o="${esc(t.n)}">${t.th?`<img class="tm" src="${esc(tu(t.th))}" alt="">`:`<canvas width="16" height="16" data-ci="${i}"></canvas>`}<div><input class="dn" value="${esc(t.n)}" aria-label="生徒名"><div class="rw"><label class="ck"><input type="checkbox" data-ck${DSEL.has(t.n)?" checked":""} aria-label="選択"></label><select class="dk" aria-label="ロール">${["st","sp",""].map(v=>`<option value="${v}"${(t.k||"")===v?" selected":""}>${v==="st"?"ST":v==="sp"?"SP":"未設定"}</option>`).join("")}</select><button class="del" data-sv>保存</button><button class="del" data-dx>削除</button></div></div></div>`).join("");
   l.forEach((t,i)=>{const cv=$(`[data-ci="${i}"]`);if(!cv)return;const x=cv.getContext("2d"),id=x.createImageData(16,16);for(let p=0;p<256;p++){id.data[p*4]=t.f[p*3];id.data[p*4+1]=t.f[p*3+1];id.data[p*4+2]=t.f[p*3+2];id.data[p*4+3]=255}x.putImageData(id,0,0)});
   $("#dm").textContent=TPL.length?(l.length?"":"該当なし"):"まだ登録がありません";
   $("#ddel").textContent=`選択を削除(${DSEL.size}件)`;
@@ -904,23 +917,23 @@ $("#dl").onclick=async e=>{
 function dl(name,text,type){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000)}
 const stamp=()=>new Date().toISOString().slice(0,10);
 $("#nmc").onclick=()=>{if(!NAMES.length){$("#nmm").textContent="記憶はありません";return}if(!confirm(`覚えた相手名${NAMES.length}件を消します。よろしいですか?`))return;NAMES=[];LS.set("bat-names",NAMES);$("#nmm").textContent="消しました"};
-$("#bkj").onclick=()=>dl(`tactics-backup-${stamp()}.json`,JSON.stringify({v:1,records:S.records,icons:TPL.map(t=>({n:t.n,k:t.k||null,d:t.d})),config:{students:{st:S.st,sp:S.sp},growth:S.growth,th:S.th},players:allPlayers(),names:NAMES}),"application/json");
+$("#bkj").onclick=()=>dl(`tactics-backup-${stamp()}.json`,JSON.stringify({v:1,records:S.records,icons:TPL.map(t=>({n:t.n,k:t.k||null,d:t.d,th:t.th||undefined})),config:{students:{st:S.st,sp:S.sp},growth:S.growth,th:S.th},players:allPlayers(),names:NAMES}),"application/json");
 $("#bkc").onclick=()=>{
-  const q=v=>`"${String(v??"").replace(/"/g,'""')}"`;
-  const h=["日時","勝敗","自分","相手",...NM.map(x=>"防衛"+x),...NM.map(x=>"攻撃"+x),"編成提供者","メモ","種別"];
-  const rows=S.records.map(r=>[r.t,r.r,r.me,r.n,...r.d,...r.a,r.p,r.m,r.o==="D"?"防衛":"攻撃"]);
+  const q=v=>{let t=String(v??"");if(/^[=+\-@\t\r]/.test(t))t="'"+t;return `"${t.replace(/"/g,'""')}"`};
+  const h=["日時","シーズン","勝敗","自分","相手",...NM.map(x=>"相手側"+x),...NM.map(x=>"自分側"+x),"編成提供者","メモ","種別"];
+  const rows=S.records.map(r=>[r.t,rSeason(r),r.r,r.me,r.n,...r.d,...r.a,r.p,r.m,r.o==="D"?"防衛":"攻撃"]);
   dl(`tactics-records-${stamp()}.csv`,"\ufeff"+[h,...rows].map(r=>r.map(q).join(",")).join("\r\n"),"text/csv");
 };
 $("#bki").onchange=async()=>{
   const f=$("#bki").files[0];if(!f)return;const m=$("#bkm");let ok=0;
   try{
     const j=JSON.parse(await f.text()),recs=Array.isArray(j)?j:(j.records||[]),ics=Array.isArray(j.icons)?j.icons:[];
-    const have=new Set(S.records.map(r=>r.t+"|"+r.n));
-    const nr=recs.filter(r=>r&&!have.has(r.t+"|"+r.n)),ni=ics.filter(x=>x&&x.n&&x.d&&!TPL.some(t=>t.n===x.n));
+    const have=new Set(S.records.map(r=>r.t+"|"+r.n+"|"+(r.o||"")));
+    const nr=recs.filter(r=>r&&!have.has(r.t+"|"+r.n+"|"+(r.o||""))),ni=ics.filter(x=>x&&x.n&&x.d&&!TPL.some(t=>t.n===x.n));
     if(!confirm(`記録${nr.length}件(重複${recs.length-nr.length}件は除外)と新規アイコン${ni.length}件を追加します。よろしいですか?`)){$("#bki").value="";return}
     const tot=nr.length+ni.length;
-    for(const r of nr){const c={...r};delete c.id;await api("POST","/records",c);ok++;m.textContent=`登録中 ${ok}/${tot}`}
-    for(const x of ni){await api("POST","/icons",{n:x.n,k:x.k||null,d:x.d});ok++;m.textContent=`登録中 ${ok}/${tot}`}
+    for(let i=0;i<nr.length;i+=100){const ch=nr.slice(i,i+100).map(r=>{const c={...r};delete c.id;return c});await api("POST","/records/bulk",ch);ok+=ch.length;m.textContent=`登録中 ${ok}/${tot}`}
+    for(const x of ni){await api("POST","/icons",{n:x.n,k:x.k||null,d:x.d,th:x.th||undefined});ok++;m.textContent=`登録中 ${ok}/${tot}`}
     if(Array.isArray(j.names)){for(const x of j.names)if(x&&x.n&&x.d&&!NAMES.some(q=>q.n===x.n&&q.d===x.d))NAMES.push({n:x.n,d:x.d});LS.set("bat-names",NAMES)}
     m.textContent=`${ok}件を復元しました`;
   }catch(e){m.textContent=`${ok}件復元後に失敗しました: `+(e&&e.message||"")}
@@ -931,6 +944,12 @@ $("#plb").onclick=async()=>{
   try{await api("PUT","/config",{students:{st:S.st,sp:S.sp},th:S.th,players:l})}catch(e){$("#bkm").textContent="保存に失敗しました: "+(e&&e.message||"");return}
   $("#bkm").textContent="共通候補に保存しました";syncAll();
 };
+let tp=0,tpt=0;
+$("#sth").onclick=()=>{const n=Date.now();tp=n-tpt>3000?1:tp+1;tpt=n;if(tp>=7){tp=0;$("#kc").hidden=false;$("#ki").focus()}};
+$("#ks").onclick=()=>{const v=$("#ki").value.trim();if(!v)return;KEY=v;try{localStorage.setItem("bat-key",KEY)}catch(e){}$("#ki").value="";$("#kc").hidden=true;applyMode();syncAll()};
+$("#kx").onclick=()=>{if(!confirm("この端末のキーを消します。"))return;KEY="";ROLE="";LS.set("bat-role","");try{localStorage.removeItem("bat-key")}catch(e){}$("#kc").hidden=true;applyMode()};
+$("#ssd").querySelector("summary").onclick=()=>{SSU=!$("#ssd").open};
+addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("#sh").hidden)$("#shx").click()});
 (async()=>{
   const L=LS.get("bat-local",{});
   S.players=Array.isArray(L.players)?L.players.filter(x=>typeof x==="string"):[];S.cont=L.ct===true;S.me=typeof L.me==="string"?L.me:"";S.season=typeof L.season==="string"?L.season:"";S.role=L.role==="D"?"D":"";F=fresh();
