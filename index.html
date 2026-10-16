@@ -403,7 +403,7 @@ async function syncRun(full,quick){
 
 /* アイコン照合の共通処理(特徴量: 各枠を16x16に区切ったRGB平均 = 768バイト) */
 const SH=[[0,0],[-2,0],[2,0],[0,-2],[0,2]];
-const SH4=[-4,-2,0,2,4];
+const SH4=[-4,-2,0,2,4],ROLESH=SH4.flatMap(dx=>SH4.map(dy=>[dx,dy]));
 const gradF=f=>{const l=new Float32Array(256),g=[];
   for(let p=0;p<256;p++)l[p]=(f[p*3]+f[p*3+1]+f[p*3+2])/3;
   for(let y=0;y<15;y++)for(let x=0;x<15;x++){g.push(l[y*16+x+1]-l[y*16+x]);g.push(l[(y+1)*16+x]-l[y*16+x])}
@@ -414,24 +414,30 @@ const LAYOUT_DEF={CX:1170,REF:1080,SX:[321,446,571,697,822,947,1383,1508,1633,17
 const LAYOUT=(()=>{const o=LS.get("bat-layout",null);if(!o||typeof o!=="object"||Array.isArray(o))return LAYOUT_DEF;if(o.SX&&!(Array.isArray(o.SX)&&o.SX.length===12))return LAYOUT_DEF;return{...LAYOUT_DEF,...o}})();
 const {REF,SX,CY,CW,CHH}=LAYOUT,FN=16;
 /* 読み取り失敗時の診断文(想定と違う画面比率・読めた枠が少ない・攻守/勝敗の印が見つからない) */
-const layoutDiag=(im,ok,r,ro)=>{const ar=im.width/im.height,e=Math.abs(ar-LAYOUT.AR)/LAYOUT.AR;let t="";
-  if(e>LAYOUT.ART)t+=`画面比率が想定(${LAYOUT.AR.toFixed(2)})と違います(${im.width}×${im.height})。戦闘履歴の全体が写った画面ですか?`;
-  if(ok<=3)t+="読み取れた枠が少なすぎます。別の画面・切り抜き・ゲームの画面更新の可能性があります。";
+const layoutDiag=(im,ok,r,ro)=>{const ar=im.width/im.height,e=Math.abs(ar-LAYOUT.AR)/LAYOUT.AR,cu=!!(im.cal&&im.cal.used);let t="";
+  if(im.height>im.width)t+="画像が縦向きです。横向きの画面のスクショを選んでください。";
+  else if(e>LAYOUT.ART&&!cu)t+=`画面比率が想定(${LAYOUT.AR.toFixed(2)})と違います(${im.width}×${im.height})。戦闘履歴の全体が写った画面ですか?`;
+  if(ok<=3)t+="読み取れた枠が少なすぎます。"+(im.cal&&!im.cal.used?"画面位置の自動補正でも合いませんでした。":"")+"別の画面・切り抜き・ゲームの画面更新の可能性があります。";
   if(!r&&ro==null)t+="勝敗と攻守の印も判別できませんでした(座標のずれの可能性)。";
   return t};
 const sameChar=(a,b)=>!!a&&!!b&&a.split("(")[0]===b.split("(")[0];
-function slotBox(W,H,i){const k=H/REF;return{x:Math.round(W/2+(SX[i]-LAYOUT.CX)*k-CW*k/2),y:Math.round(CY*k-CHH*k/2),w:Math.round(CW*k),h:Math.round(CHH*k)}}
-function feat(im,b){
-  const o=new Uint8Array(FN*FN*3);
-  for(let gy=0;gy<FN;gy++)for(let gx=0;gx<FN;gx++){
-    const x0=b.x+Math.floor(gx*b.w/FN),y0=b.y+Math.floor(gy*b.h/FN);
-    const x1=Math.max(b.x+Math.floor((gx+1)*b.w/FN),x0+1),y1=Math.max(b.y+Math.floor((gy+1)*b.h/FN),y0+1);
+/* 座標変換T: 基準座標(高さ1080・中心x=1170)→画像px。k=拡大率, cx=基準中心xの画像上の位置, oy=縦のずれ。
+   既定は「高さ基準・中央揃い」。自動補正(calibrate)が成功すると im.T に入り、枠・勝敗・攻守・相手名の全部が同じTを使う */
+const geo=im=>im.T||{k:im.height/REF,cx:im.width/2,oy:0};
+const GX=(T,x)=>T.cx+(x-LAYOUT.CX)*T.k,GY=(T,y)=>T.oy+y*T.k;
+function slotBox(W,H,i,T){T=T||{k:H/REF,cx:W/2,oy:0};const k=T.k;return{x:Math.round(T.cx+(SX[i]-LAYOUT.CX)*k-CW*k/2),y:Math.round(T.oy+CY*k-CHH*k/2),w:Math.round(CW*k),h:Math.round(CHH*k)}}
+function feat(im,b,N){
+  N=N||FN;
+  const o=new Uint8Array(N*N*3);
+  for(let gy=0;gy<N;gy++)for(let gx=0;gx<N;gx++){
+    const x0=b.x+Math.floor(gx*b.w/N),y0=b.y+Math.floor(gy*b.h/N);
+    const x1=Math.max(b.x+Math.floor((gx+1)*b.w/N),x0+1),y1=Math.max(b.y+Math.floor((gy+1)*b.h/N),y0+1);
     let r=0,g=0,l=0,n=0;
     for(let y=y0;y<y1;y++)for(let x=x0;x<x1;x++){
       if(x<0||y<0||x>=im.width||y>=im.height)continue;
       const p=(y*im.width+x)*4;r+=im.data[p];g+=im.data[p+1];l+=im.data[p+2];n++;
     }
-    n=n||1;const q=(gy*FN+gx)*3;o[q]=r/n;o[q+1]=g/n;o[q+2]=l/n;
+    n=n||1;const q=(gy*N+gx)*3;o[q]=r/n;o[q+1]=g/n;o[q+2]=l/n;
   }
   return o;
 }
@@ -439,20 +445,22 @@ function norm(a){let m=0;for(const v of a)m+=v;m/=a.length;const z=Float32Array.
 const sim=(a,b)=>{let s=0;for(let i=0;i<a.length;i++)s+=a[i]*b[i];return s};
 /* 勝敗: 左(自分)の「Win/Lose」文字。Winだけ金色なので、左右どちらに金色があるかで判定する */
 function judge(im){
-  const k=im.height/REF,cnt=(x0,x1)=>{let n=0;const xa=Math.round(im.width/2+(x0-LAYOUT.CX)*k),xb=Math.round(im.width/2+(x1-LAYOUT.CX)*k),ya=Math.round(LAYOUT.J.y[0]*k),yb=Math.round(LAYOUT.J.y[1]*k);
+  const T=geo(im),k=T.k,J=LAYOUT.J,cnt=(x0,x1)=>{let n=0;const xa=Math.round(GX(T,x0)),xb=Math.round(GX(T,x1)),ya=Math.round(GY(T,J.y[0])),yb=Math.round(GY(T,J.y[1]));
     for(let y=ya;y<yb;y++)for(let x=xa;x<xb;x++){if(x<0||y<0||x>=im.width||y>=im.height)continue;const p=(y*im.width+x)*4;if(im.data[p]>200&&im.data[p+1]>150&&im.data[p+2]<110)n++}
     return n/(k*k)};
-  const J=LAYOUT.J,L=cnt(J.l[0],J.l[1]),R=cnt(J.r[0],J.r[1]);
+  const L=cnt(J.l[0],J.l[1]),R=cnt(J.r[0],J.r[1]);
   return L>J.min&&L>R*J.ratio?"WIN":R>J.min&&R>L*J.ratio?"LOSE":"";
 }
 /* 攻撃/防衛: 左(自分)の剣/盾マーク。剣=攻撃、盾=防衛。右(相手)は逆のマークが付く */
 const RT={"SW_L": "9/f19/f19/f19/f19/f19/f09/f19/f19/f19vf10drfl6i3sMLSzN7u4u767fP69/f19/f19/f19/f19/f19/b19vf19/f19vf18PP0m7C/+Pv95vD24+/48ff75e3z9/f19/f19/f19/f19/f19/b19vb19vb08/X0nrC75+3w/v798fb68PX7/v7+x9Pd9vb09vb09/f19vf19/f19vf19/f19vb2obG52uTo//7//Pz95u/36PD3/f7+uMbR9vb09vb09/f2rcPPydri9/f29/f1y9TZucXO/v7+/Pz85PD2yd7uyN7v0eTxqrnF9vb09vf03ubqMqbMMarRt9Ld5Ovuo7jD/f7+/Pz75O/2yN/vyN7uwtrqkqu7t8HF9vb09vb0l7rMKcT3Jsn9L6LSd5ex9vn6+/z75PD3yN7uyN7vutHlkKm0w8jK1tfV9vb09fb0xtTbQKnMJ8f7Jsj9WMju6Pb64ez2x97vxdzvnrTOn628xMbG39/d8vPw9vb09fXz29vYxdDWM5G/J8f5KMn7U7rsu9nvxdzvjqi9s77DxMTD5+fl9fXz9vb09vb09vb08vPyobTDOGSNMpG7JLnzGaTnTLDjdJe1wsbNzM3L7Ozq9fXz9/f19vb09vb09vf1n7TBRHCVSnCVOF6BJnqtHaPmGqTmKpXKrcHR7+/v9fXz9vb09/f19vb09/j3n7PCP2uORmqMRWqMPWGDLlh/I4bAG6ToGqPnKo/Jztzk9vf09vb09vb09vb0rb7PPWeMRWyNQGSFNlh6O2OKj6e9oLTEIonHHJvfLIe7vM7T9fXz9vb09/f19vb0q7vJQ2qQPmGDNll7M1mBiJ61y83NycrIqLfAkai4vcLF29zZ9PTy9vb09vb09vb01tfWqr7MO2WJMluAhJ+5zc/P6urn7u7s0tLQx8fG3t7c8fHv9vb09vb09vb09/f17Ozq0dLRpbTEm6y8zs/O6Ojm9fXz9vb08/Px8/Px9vb09vb09vb09vb09/f19vb0", "SH_R": "/uHX/uHX/eHY/+HX/uHX/eXd7urpaZemTI+xm628+uzn/eHZ/+HX/uHX/uHX/+HW/uHX9urn0tTZ+fDt5ebppbTEWYqhod/ro9zyY6zJbJGmzdHW8+zr8Ovp8+vo/uHY/eHYucLMWZ66VpuzabLGnNnl2Pb7+P7+yd/wvN/zlNLraKrKU5GyVpa4dJCn/ebd/eHYsL3Gk9bk9f79+v///f7+/v//7/z+ptbvx+Dzx97xxd/yxOH0m9n1XIih/ebe/eHYrrvFltTj/v7+7/r87v3+xfD6XdH2KbTrbMXvrNr0v9/zx9/xntr0Xomg/ebe/eHYrLrEmdXk///+p+T2K8f6Kcj8Jsn+HrHwHrHuIrDtP7Lpw+Dzntr0X4mg/ebe/eHYq7nDm9bl//7+ouT2Jsn/Jsr/Jsn+HrHwILDwH7HvO7Ttw+DyoNn0YIeh/ebe/eHXqLbAnNbl//7+n+P1Jsn/Jsr/J8j/HrHwILHwH7HvO7Ttw9/zn9r0Yomj/ube/eHYpbS+m9bm////neL1Jsr+Jsn/Jsn+HrHwH7HvILHvO7Ttw97zndrzYIii/ebe/eHYorK9ndjn//7/oOHzJ8n+Jcr/Jsn/HrHwH7DvILDvPLPswt/zn9r1XYmg/efe/eHXprW+jtDg9v7+8fz+gd35K8j7J8n+HrHwH7DvPbbundTyxt/xldfwZYmg/ebe/uDX7+blbZOjlt7m5Pz9+v7+uOz5PMn4IrHuWb7tuN30wODykNfsVpGn0dTZ/eHY/uDW99vS5tzcgJirb6/H1/j9+/39zPD6hc3vxOD0ttzzd8TeVYmg1NfZ79fR/uDW/uDW/uDW+NvS7NnVtbzEZp6xu/L28vz9x+LwpNnxYqbGiKS05t7c89jQ/d/W/uDW/uDW/uDW/uDW/N/V7dTL2tjZWImdk9vpjtPpUI2qtcDH6tXP+NvS/uDW/uDW/uDW/uDW/uDW/uDW/uHX/uDW9dnR59zZjqu2epyw1NXW79fQ/N7U/uDW/d/V/uDW/uDW", "SH_L": "9/f19/f19vb19/b19vf19/f1+Pn4lrC6VJ26Y4ih5urs9/f19vb09vb09/f09vf09/f1+Pj20Nfc8fb37/b4ws/aaYugfsDStej2gMjkVoqjrr3J5+zv9/r65Ojq9/f29/f1+fr5XpGsWJ20XaW8iMrYxPD48fz94O32w+DzpNnxeLnYXZy7T5GxTHqc7vHz9/f1+Pn5aaW45v7++P7+/P7//v7+/P//suDxweD2x9/xxt/xxuDztOD1TI6x6u7w9/f19/j6aKO37/7++/7+7vv92vb8ht/3KrrwS7rsm9T0vuD1w97yud7xTZGv6+/w9/f19/n6aKK38P7+8f//O8bzKsj7Jsn+Ibr0HrDvIrDuJ67rmdLvuN/xTpCv6+7w9/f1+Pr7aKK38f/+8P//Ncf3Jsn/Jsn+Ibv1ILHwH7HwIq/vmdPwut7xUI6w6+7w9/f19/n6ZqC38v/+7//+NMf2Jsn/Jcr+Ibr1ILHwILHwIrDvmdLwut/yTo+w6+7w9/f19/n6Yp638v/+7//+M8b2Jsn/Jsn/Ibv1H7HwH7HwIrDvmNLxud7xTY+v6+7w9/f1+Pr6YJ638//+7///NcX1Jcr+Jsn/Ibv1H7DwH7HvI6/umNHvut7xTZGv6+/w9vb0+Pr5X5yy4v3+/f7/sOv6O8v4J8n+Ibv2HrDwKbHtd8jwwt7ysN7wTY2r6+/w9vb09PXzmq+6bbXCyfb6+v7+4/r9XNH2I7r0N7PsoNX0xt7xqt3xYKrAjaWz9vb09vb09fXz7Ozrsb3JXZCptenz9/7+7Pv9hNDwtN32w97yk9TuUJmxpbnD6ero9PTy9vb09/f19PTy6uro1djbc5qtk9Xf5vz83e31tt7yd73dZZOrxdHW6eno9PTy9vb09vb09vb09vb09vb07u/s6erpiqSybbXIqef1YqrHgZ6v5+no6uro9fXz9vb09vb09vb09vb09vb09vb09vb08/Lw6OnorsHHdZyyqLzE6ero8fHv9vb09vb09vb09vb0", "SW_R": "/+HX/+HX/+HX/+HX/+DX/+DW/+HX/uDW/uDW/OTcrrnDqLfEus3d1uf15fD4v8rW/+HX/+HX/+HX/+HX/+HX/+HX/uHX/uHW/eLZ0dTYtMTP8fb54/D35PD4+fz9s8LM/+HX/+HX/uHX/+HX/+HW/+HX/uHX/uHY3dnaobK+/P7+/P3+6vL59/r8/v7+rb3K/uHW/+DX/uHY/ePb/uHX/+HX/uHX7eHelamy+v3+/v79+Pv83en08vf7/v7+rb7M/uHX/uHY7+Phm7XD8Ojn/uHY/OXfo6+58PT3/v79+Pv81OXxyN7vyN/v1+bwrrfB/uHX/eLZob3MLLzmVKTB4+Dju8TOydXb/f39+Pv71ubyyN/uyN/vscral6m00sfE/uDW+uTeVqbKJsr9JsT5RJS9qr3N/f39+Pv80+XxyN7vx97vobvMorK5xray7NDI/uDW9tzVmbvKLLfiJcn+KsT3mdrw9Pr80uPxxt3vvtTplanBtba9zbmz8NPL/d/V/uDW+NvS0sC7k7THJajcJ8r8LsT4esLrxdzuuM/kjKS0wbm4176399nQ/uDV/uDW/uDW/eHX6eHfZoWhNWePL63dHa3sHKLjcbHYkKW9yLu548jB+NvS/uDW/uDW/uDW/eLY8ebkboykR3CVR22QL16EIpDNG6ToHKLhUprC1M3S+d3U/d/V/uHW/uDW/uDW7OXlYYWeQmqNSW2PQGWHO12ALGOPHZXXGqToG6DkVpjB+Ojl/uDW/uDW/uDW/uDWZ4elQmqNQ2qLOVt+Ol2ARWyQv8nUa5e4HJndHZLUTY+28eTc/uDW/uDW/+HX/uDWaoajRWuQOl1+NFh7PGOLtrzHzLiyy767kqa3pKy1zL6779TL/uDW/uDW/uDW/uDW19LRbY6qNl+DP2iOuMPP2cO999rS7tHKz7au1Lu07tHJ/d7V/uDW/uDW/uDW/uDW5cvE0MbHkKG0vsDF2cK899rQ/uDW/d/W+tzT+93U/uDW/uDW/uHX/uDW/uDW/uDW"};
 let RZ=null;
-const iconBox=(im,xr,yr)=>{const k=im.height/REF,w=70*k,h=70*k;return{x:Math.round(im.width/2+(xr-LAYOUT.CX)*k-w/2),y:Math.round(yr*k-h/2),w:Math.round(w),h:Math.round(h)}};
+const iconBox=(im,xr,yr)=>{const T=geo(im),k=T.k,w=70*k,h=70*k;return{x:Math.round(GX(T,xr)-w/2),y:Math.round(GY(T,yr)-h/2),w:Math.round(w),h:Math.round(h)}};
 function roleOf(im){
   if(!RZ){RZ={};for(const[k,v]of Object.entries(RT))RZ[k]=norm(unb64(v))}
   let a=-9,d=-9;
-  for(const[dx,dy]of SH){
+  const ks=geo(im).k;
+  for(const[sx,sy]of ROLESH){
+    const dx=Math.round(sx*ks),dy=Math.round(sy*ks);
     const bl=iconBox(im,LAYOUT.RI.l,LAYOUT.RI.y),br=iconBox(im,LAYOUT.RI.r,LAYOUT.RI.y);
     const zl=norm(feat(im,{...bl,x:bl.x+dx,y:bl.y+dy})),zr=norm(feat(im,{...br,x:br.x+dx,y:br.y+dy}));
     a=Math.max(a,sim(zl,RZ.SW_L)+sim(zr,RZ.SH_R));d=Math.max(d,sim(zl,RZ.SH_L)+sim(zr,RZ.SW_R));
@@ -622,7 +630,7 @@ const NZ=new WeakMap(),nameZ=t=>{let z=NZ.get(t);if(!z){z=norm(unb64(t.d));NZ.se
 let NAMES=LS.get("bat-names",[]);if(!Array.isArray(NAMES))NAMES=[];
 let NF=null;
 function nameFeat(im,dx,dy){
-  const k=im.height/REF,bx=Math.round(im.width/2+(NMB[0]-LAYOUT.CX)*k)+dx,by=Math.round(NMB[1]*k)+dy,bw=Math.round(NMB[2]*k),bh=Math.round(NMB[3]*k);
+  const T=geo(im),k=T.k,bx=Math.round(GX(T,NMB[0]))+dx,by=Math.round(GY(T,NMB[1]))+dy,bw=Math.round(NMB[2]*k),bh=Math.round(NMB[3]*k);
   const o=new Uint8Array(NGX*NGY);
   for(let gy=0;gy<NGY;gy++)for(let gx=0;gx<NGX;gx++){
     const x0=bx+Math.floor(gx*bw/NGX),y0=by+Math.floor(gy*bh/NGY),x1=Math.max(bx+Math.floor((gx+1)*bw/NGX),x0+1),y1=Math.max(by+Math.floor((gy+1)*bh/NGY),y0+1);
@@ -651,11 +659,26 @@ function learnName(rec){
   NAMES.push({n:rec.n,d:b64(NF)});LS.set("bat-names",NAMES);NF=null;
 }
 /* スクショ読み取り(アイコン照合。AIは使わない) */
-async function imgData(f){const b=await createImageBitmap(f),c=document.createElement("canvas");c.width=b.width;c.height=b.height;const x=c.getContext("2d",{willReadFrequently:true});x.drawImage(b,0,0);const d=x.getImageData(0,0,b.width,b.height);b.close&&b.close();return d}
+/* 黒帯(レターボックス・切り欠き)の検出。端が真っ黒な行・列だけを落とす(各辺最大22%)。拡大率・位置は別途 calibrate が合わせる */
+function barTrim(d){
+  const W=d.width,H=d.height,p=d.data,lim=.22;
+  const dk=(x,y)=>{const i=(y*W+x)*4;return p[i]<14&&p[i+1]<14&&p[i+2]<14};
+  const rd=y=>{let n=0,t=0;for(let x=0;x<W;x+=4){t++;if(dk(x,y))n++}return n>=t*.985};
+  const cd=x=>{let n=0,t=0;for(let y=0;y<H;y+=4){t++;if(dk(x,y))n++}return n>=t*.985};
+  let t=0,b=0,l=0,r=0;
+  while(t<H*lim&&rd(t))t++;
+  while(b<H*lim&&rd(H-1-b))b++;
+  while(l<W*lim&&cd(l))l++;
+  while(r<W*lim&&cd(W-1-r))r++;
+  return{x:l,y:t,w:W-l-r,h:H-t-b,cut:t+b+l+r};
+}
+async function imgData(f){const b=await createImageBitmap(f),c=document.createElement("canvas");c.width=b.width;c.height=b.height;const x=c.getContext("2d",{willReadFrequently:true});x.drawImage(b,0,0);let d=x.getImageData(0,0,b.width,b.height);b.close&&b.close();
+  const t=barTrim(d);if(t.cut>=4&&t.w>=200&&t.h>=200)d=x.getImageData(t.x,t.y,t.w,t.h);
+  return d}
 async function matchAll(im,TP){
   const TD=TP||TPL,th=S.th,LOW=0.55,MG=0.1,PRE=40,sc=[];
   for(let i=0;i<SX.length;i++){await new Promise(r=>setTimeout(r));
-    const b=slotBox(im.width,im.height,i),kd=(i%6)<4?"st":"sp",zs=[];
+    const b=slotBox(im.width,im.height,i,im.T),kd=(i%6)<4?"st":"sp",zs=[];
     for(const dy of SH4)for(const dx of SH4){const f=feat(im,{...b,x:b.x+dx,y:b.y+dy});zs.push([norm(f),norm(gradF(f))])}
     /* 先に中心位置だけで全辞書を粗く採点し、上位PRE件だけ25通りのずれで精査する(約10倍速い) */
     const bm={},pre=[],c0=zs[12];
@@ -685,6 +708,168 @@ async function matchAll(im,TP){
   }
   return out;
 }
+/* ---- 画面レイアウトの自動補正 ----
+   12枠は決まった並びなので、座標変換(k=拡大率・cx=中心x・oy=縦ずれ)を動かし、各枠と登録済みアイコンの類似度の合計が最大になる所を探す。
+   粗い特徴(4×4)の格子探索 → 山登り → 細かい特徴(8×8)で仕上げる。既定の配置が既に合っていれば何もしない。
+   既定より明確に良い時だけ im.T に入れて採用。解像度ごとの結果は bat-geo に覚えて、次回は近道する */
+let CTS=null,CTP={};
+function coarseSet(TD,n){
+  if(CTS!==TD){CTS=TD;CTP={}}
+  if(CTP[n])return CTP[n];
+  const f=FN/n,o={st:[],sp:[]};
+  for(const t of TD){
+    if(!t||!t.f||VMAP.has(hw(t.base)))continue;
+    const a=new Float32Array(n*n*3);
+    for(let y=0;y<FN;y++)for(let x=0;x<FN;x++){const q=(Math.floor(y/f)*n+Math.floor(x/f))*3,p=(y*FN+x)*3;a[q]+=t.f[p];a[q+1]+=t.f[p+1];a[q+2]+=t.f[p+2]}
+    const z=norm(a);
+    if(!t.k||t.k==="st")o.st.push(z);
+    if(!t.k||t.k==="sp")o.sp.push(z);
+  }
+  return CTP[n]=o;
+}
+const GEOY=()=>new Promise(r=>setTimeout(r));
+function geoScore(im,TS,n,T){
+  let s=0;const W=im.width,H=im.height;
+  for(let i=0;i<SX.length;i++){
+    const b=slotBox(W,H,i,T);
+    if(b.w<n||b.h<n||b.x<0||b.y<0||b.x+b.w>W||b.y+b.h>H){s-=.2;continue}
+    const z=norm(feat(im,b,n)),L=(i%6)<4?TS.st:TS.sp;
+    let m=-1;for(const q of L){const v=sim(z,q);if(v>m)m=v}
+    s+=m;
+  }
+  return s;
+}
+/* 座標ごとに±1歩ずつ試す山登り。改善しなければ歩幅を半分に */
+async function geoClimb(T,sc,st,kmin){
+  let cur=sc(T),it=0;
+  const mv=[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]];
+  while(st.k>=kmin&&it++<60){
+    let moved=false;
+    for(const[a,b,c]of mv){
+      const nt={k:T.k*(1+a*st.k),cx:T.cx+b*st.x,oy:T.oy+c*st.y},v=sc(nt);
+      if(v>cur+1e-6){cur=v;T=nt;moved=true}
+    }
+    if(!moved){st.k/=2;st.x/=2;st.y/=2}
+    if(it%3===0)await GEOY();
+  }
+  return{T,s:cur};
+}
+/* 仕上げ: 各枠の「最も似ているアイコン」が実際にどこにあるかを±数%の範囲で実測し、
+   枠の位置が(k,cx,oy)の一次式に乗るように最小二乗で合わせ直す(外れ値は除く)。山登りより細かいずれを取れる */
+function geoRefine(im,TD,T0,lim){
+  const W=im.width,H=im.height,N=SX.length;
+  let T=T0,moved=false;
+  for(let round=0;round<5;round++){
+    const pts=[];
+    for(let i=0;i<N;i++){
+      const b=slotBox(W,H,i,T),kd=(i%6)<4?"st":"sp";
+      if(b.w<8||b.h<8)continue;
+      const z0=norm(feat(im,b)),cs=[];
+      for(const t of TD){if(!t||!t.z||(t.k&&t.k!==kd)||VMAP.has(hw(t.base)))continue;cs.push([sim(z0,t.z),t])}
+      cs.sort((a,c)=>c[0]-a[0]);const tops=cs.slice(0,3).map(x=>x[1]);
+      if(!tops.length)continue;
+      const r=lim||Math.max(4,Math.round(b.w*.25)),stp=lim?1:3;let bx=0,by=0,bv=-1;
+      const at=(dx,dy)=>{const z=norm(feat(im,{...b,x:b.x+dx,y:b.y+dy}));let v=-1;for(const t of tops){const q=sim(z,t.z);if(q>v)v=q}if(v>bv){bv=v;bx=dx;by=dy}};
+      for(let dy=-r;dy<=r;dy+=stp)for(let dx=-r;dx<=r;dx+=stp)at(dx,dy);
+      if(!lim){const cx0=bx,cy0=by;for(let dy=cy0-2;dy<=cy0+2;dy++)for(let dx=cx0-2;dx<=cx0+2;dx++)at(dx,dy)}
+      if(bv>=0.6)pts.push({xs:SX[i]-LAYOUT.CX,mx:b.x+b.w/2+bx,my:b.y+b.h/2+by,w:Math.max(.02,bv-.5),bw:b.w});
+    }
+    if(pts.length<4)break;
+    let use=pts,fit=null;
+    for(let pass=0;pass<2;pass++){
+      let Sw=0,Sx=0,Sy=0,Sxx=0,Sxy=0;
+      for(const q of use){Sw+=q.w;Sx+=q.w*q.xs;Sy+=q.w*q.mx;Sxx+=q.w*q.xs*q.xs;Sxy+=q.w*q.xs*q.mx}
+      const den=Sw*Sxx-Sx*Sx;if(!(den>1e-6))break;
+      const k=(Sw*Sxy-Sx*Sy)/den,cx=(Sy-k*Sx)/Sw;
+      if(!(k>T.k*.5&&k<T.k*2))break;
+      let so=0;for(const q of use)so+=q.w*(q.my-CY*k);
+      const oy=so/Sw;fit={k,cx,oy};
+      if(pass===0){const keep=use.filter(q=>Math.abs(q.mx-(cx+k*q.xs))<Math.max(4,.2*q.bw)&&Math.abs(q.my-(oy+CY*k))<Math.max(4,.2*q.bw));if(keep.length<4||keep.length===use.length)break;use=keep}
+    }
+    if(!fit)break;
+    const d=Math.abs(fit.k/T.k-1)<.002&&Math.abs(fit.cx-T.cx)<.7&&Math.abs(fit.oy-T.oy)<.7;
+    T=fit;moved=true;if(d)break;
+  }
+  return moved?T:null;
+}
+/* 段階A: 拡大率kの候補ごとに、(横ずれa・縦ずれb)を総当たりして「12枠の合計類似度」が最大の位置を探す。
+   画面はふつう中央揃いなので、cx=W/2, oy=H/2-REF/2*k を中心に±数%だけ動かす。
+   位置ずれには鋭いので、拡大率ごとに全ずれを調べる(枠ごとの特徴は4×4に粗くして軽くしている) */
+const SCAN6=[1,3,5,6,8,10];
+async function geoScan(S,S3,k){
+  const W=S.width,H=S.height,base={k,cx:W/2,oy:H/2-REF/2*k},bs=[];
+  for(let i=0;i<SX.length;i++)bs.push(slotBox(W,H,i,base));
+  const sx=Math.max(3,Math.round(bs[0].w*.12)),sy=Math.max(3,Math.round(bs[0].h*.12));
+  const A=Math.round(W*.05/sx),B=Math.round(H*.06/sy);
+  let best={s:-99,T:base};
+  for(let b=-B;b<=B;b++){
+    for(let a=-A;a<=A;a++){
+      let s=0;
+      for(const i of SCAN6){
+        const q=bs[i],x=q.x+a*sx,y=q.y+b*sy;
+        if(q.w<3||q.h<3||x<0||y<0||x+q.w>W||y+q.h>H){s-=.2;continue}
+        const z=norm(feat(S,{x,y,w:q.w,h:q.h},4)),L=(i%6)<4?S3.st:S3.sp;
+        let m=-1;for(const t of L){const v=sim(z,t);if(v>m)m=v}
+        s+=m;
+      }
+      if(s>best.s)best={s,T:{k,cx:base.cx+a*sx,oy:base.oy+b*sy}};
+    }
+    await GEOY();
+  }
+  return best;
+}
+/* 計算量を抑えるため、縦420px前後まで縮小した画像で探索し、最後に元の解像度で数pxだけ合わせ直す */
+function geoShrink(im){
+  const f=Math.max(1,Math.round(Math.min(im.width,im.height)/420));
+  if(f<2)return{im,f:1};
+  const W=Math.floor(im.width/f),H=Math.floor(im.height/f),d=new Uint8ClampedArray(W*H*4),s=im.data,w0=im.width,n=f*f;
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){let r=0,g=0,b=0;for(let j=0;j<f;j++){let p=((y*f+j)*w0+x*f)*4;for(let i=0;i<f;i++,p+=4){r+=s[p];g+=s[p+1];b+=s[p+2]}}const q=(y*W+x)*4;d[q]=r/n;d[q+1]=g/n;d[q+2]=b/n;d[q+3]=255}
+  return{im:{width:W,height:H,data:d},f};
+}
+async function calibrate(im,TD,opt){
+  opt=opt||{};
+  if(!TD||!TD.length)return null;
+  const{im:S,f}=geoShrink(im),W=S.width,H=S.height,key=im.width+"x"+im.height,k0=H/REF,T0={k:k0,cx:W/2,oy:0},N=SX.length;
+  const S3=coarseSet(TD,4),S8=coarseSet(TD,8),sc8=T=>geoScore(S,S8,8,T);
+  const base=sc8(T0),res={used:false,base:base/N,score:base/N,T:{k:im.height/REF,cx:im.width/2,oy:0}};
+  if(base/N>=0.93)return res; /* 既定のままで十分合っている */
+  let GC={};if(!opt.nocache){GC=LS.get("bat-geo",{});if(!GC||typeof GC!=="object")GC={}}
+  const g=GC[key],fromG=g&&Number.isFinite(g.kr)&&Number.isFinite(g.dx)&&Number.isFinite(g.dy)?{k:k0*g.kr,cx:W/2+g.dx*W,oy:g.dy*H}:null;
+  const fine=()=>({k:.01,x:.006*W,y:.008*H});
+  const finish=async T=>geoClimb(geoRefine(S,TD,T)||T,sc8,fine(),.002);
+  let best=null;
+  if(fromG&&sc8(fromG)/N>=0.8)best=await finish(fromG);
+  else{
+    /* 拡大率の候補: 高さ基準(k0)から縮小側へ。幅基準(kw)とその中間も入れる(UIの拡縮が高さ・幅の混合のことがあるため) */
+    const kw=W/(LAYOUT.AR*REF),mw=kw/k0;
+    const ks=[1,...(mw<.98?[mw,Math.sqrt(mw)]:[]),1.06,.93,.86,.8,.74,.68,.62,.57,.52].map(m=>k0*m);
+    const cand=[];
+    for(const k of ks){const c=await geoScan(S,S3,k);cand.push(c);if(c.s/SCAN6.length>=.88)break} /* 強く一致したら残りの倍率は試さない */
+    cand.sort((a,b)=>b.s-a.s);
+    const top=[];
+    for(const c of cand){if(top.length>=4)break;if(top.every(q=>Math.abs(q.T.k/c.T.k-1)>.04))top.push(c)}
+    for(const c of top){
+      const b=await finish(c.T);
+      if(!best||b.s>best.s)best=b;
+      if(best.s/N>=0.9)break; /* 十分合ったら他の候補は試さない */
+    }
+    /* 同じ並びが1枠ぶんずれた位置にも似た山ができる(辞書の別アイコンに当たる)ので、両隣も試す */
+    if(best&&best.s/N<0.95){
+      const sp=(SX[1]-SX[0])*best.T.k;
+      for(const sh of[-sp,sp]){const b=await finish({...best.T,cx:best.T.cx+sh});if(b.s>best.s)best=b}
+    }
+  }
+  if(!best)return res;
+  res.score=best.s/N;
+  /* 既定より平均で+0.05以上良く、かつそれなりに一致する時だけ採用 */
+  if(best.s-base>=0.6&&best.s/N>=0.6){
+    let Tf={k:best.T.k*f,cx:best.T.cx*f,oy:best.T.oy*f};
+    if(f>1)Tf=geoRefine(im,TD,Tf,f+3)||Tf;
+    res.T=Tf;res.used=true;im.T=Tf;
+    if(!opt.nocache&&best.s/N>=0.8){const G=LS.get("bat-geo",{})||{};G[key]={kr:Tf.k/(im.height/REF),dx:(Tf.cx-im.width/2)/im.width,dy:Tf.oy/im.height};LS.set("bat-geo",G)}
+  }
+  return res;
+}
 let PQ=[],PN=0;
 async function recog(){
   const fs=[...$("#shot").files],st=$("#rst");$("#shot").value="";if(!fs.length)return;
@@ -697,12 +882,12 @@ async function nextShot(){
   const pf=PN>1?`(${PN-PQ.length}/${PN}枚目)`:"";
   st.textContent=pf+"読み取り中";if(PN>1)window.scrollTo(0,0);
   try{
-    const im=await imgData(f),m=await matchAll(im),r=judge(im),ro=roleOf(im);NF=nameFeat(im,0,0);const nm=nameMatch(im);
+    const im=await imgData(f);st.textContent=pf+"画面の位置を確認中";const cal=await calibrate(im,TPL);im.cal=cal;st.textContent=pf+"読み取り中";const m=await matchAll(im),r=judge(im),ro=roleOf(im);NF=nameFeat(im,0,0);const nm=nameMatch(im);
     F.t0=f.lastModified||0;F.a=m.slice(0,6).map(x=>x.n);F.d=m.slice(6).map(x=>x.n);
     CALF=F;CAL={};m.forEach((x,i)=>{if(x.n)CAL[(i<6?"a":"d")+(i%6)]={n:x.n,s:x.s,m:x.m}});
     MISS=new Set();CAND={};AMB=new Set();HQ=[];m.forEach((x,i)=>{const k=i<6?"a"+i:"d"+(i-6);CAND[k]=x.c;if(!x.n)MISS.add(k);else if(isH(x.n)){HQ.push(k);AMB.add(k)}else if(x.m<0.06||x.s<S.th||(x.m<0.12&&sameChar(x.n,x.c.find(c=>c!==x.n))))AMB.add(k)});
     F.r=r||"";if(ro!=null){F.o=ro;if(editId==null){S.role=ro;saveLocal()}}if(nm)F.n=nm.n;drawForm();if(HQ.length){const k=HQ.shift();askH(k[0],+k[1])}
-    const ok=m.length-MISS.size,nt=(ro==null?"":`【${ro==="D"?"防衛":"攻撃"}】`)+(nm?`相手「${nm.n}」を自動入力(要確認)。`:"");
+    const ok=m.length-MISS.size,nt=(ro==null?"":`【${ro==="D"?"防衛":"攻撃"}】`)+(nm?`相手「${nm.n}」を自動入力(要確認)。`:"")+(cal&&cal.used?"画面位置を自動補正。":"");
     st.textContent=pf+nt+`${ok}/12枠を読み取りました`+(r?`(${r})`:"(勝敗は判別できませんでした)")+(MISS.size?`。黄色の枠が未認識です(しきい値 ${S.th})`:"。確認して保存してください")+(AMB.size?`。他に${AMB.size}枠が確信度の低い読み取りです(黄色)。必ず確認してください。枠をタップすると上位候補が出ます`:"");
   {const dg=layoutDiag(im,ok,r,ro);if(dg)st.textContent+=" ⚠ "+dg}}catch(e){st.textContent=pf+"読み取りに失敗しました: "+(e&&e.message||"");drawForm()}
 }
@@ -934,16 +1119,16 @@ let AD=null;
 $("#ish").onchange=async()=>{
   const f=$("#ish").files[0];if(!f)return;
   try{
-    const im=await imgData(f),m=TPL.length?await matchAll(im):SX.map(()=>({n:""}));
+    const im=await imgData(f);if(TPL.length)await calibrate(im,TPL);const m=TPL.length?await matchAll(im):SX.map(()=>({n:""}));
     const big=document.createElement("canvas");big.width=im.width;big.height=im.height;big.getContext("2d").putImageData(im,0,0);
-    AD={fs:SX.map((_,i)=>feat(im,slotBox(im.width,im.height,i))),th:SX.map((_,i)=>thumbOf(big,slotBox(im.width,im.height,i)))};
+    AD={fs:SX.map((_,i)=>feat(im,slotBox(im.width,im.height,i,im.T))),th:SX.map((_,i)=>thumbOf(big,slotBox(im.width,im.height,i,im.T)))};
     let h="";
     SX.forEach((_,i)=>{
       if(i===0||i===6)h+=`<div class="lb">${i?"相手の防衛":"自分の攻撃"}</div>`;
       h+=`<div><canvas width="72" height="60" data-c="${i}"></canvas><input list="adl" data-n="${i}" placeholder="${esc(m[i].n)||"未認識"}" aria-label="${NM[i%6]}の生徒名"><div class="mut" style="font-size:10px">${m[i].b?esc(m[i].b)+" "+m[i].s.toFixed(2):"－"}</div></div>`;
     });
     $("#ig").innerHTML=h;
-    SX.forEach((_,i)=>{const b=slotBox(im.width,im.height,i);$(`[data-c="${i}"]`).getContext("2d").drawImage(big,b.x,b.y,b.w,b.h,0,0,72,60)});
+    SX.forEach((_,i)=>{const b=slotBox(im.width,im.height,i,im.T);$(`[data-c="${i}"]`).getContext("2d").drawImage(big,b.x,b.y,b.w,b.h,0,0,72,60)});
     $("#ib").hidden=false;$("#im").textContent="";
   }catch(e){$("#im").textContent="読み込みに失敗しました: "+(e&&e.message||"")}
   $("#ish").value="";
@@ -1166,6 +1351,22 @@ async function selfTestExtra(){
       ok("layoutDiag: 想定どおりなら警告なし",layoutDiag(im,12,"WIN","")==="")}catch(e){ok("matchAll: 例外 "+e,false)}}
   ok("layoutDiag: 画面比率の違いを検出",layoutDiag({width:1000,height:1000},12,"WIN","")!=="");
   ok("layoutDiag: 読めた枠が少ない場合を検出",layoutDiag({width:2340,height:1080},2,"WIN","")!=="");
+  /* 画面の自動補正: 合成画像(拡大・ずれた配置)で、補正・読み取り・勝敗・黒帯の検出ができるか */
+  try{
+    const hs=(a,b,c,d)=>(((a*73856093)^(b*19349663)^(c*83492791)^(d*2654435761))>>>0)%256;
+    const sm=(id,u,v,c)=>{const g=4,fx=Math.min(u,.9999)*(g-1),fy=Math.min(v,.9999)*(g-1),x0=Math.floor(fx),y0=Math.floor(fy),tx=fx-x0,ty=fy-y0,q=(a,b)=>hs(id,a,b,c);return q(x0,y0)*(1-tx)*(1-ty)+q(x0+1,y0)*tx*(1-ty)+q(x0,y0+1)*(1-tx)*ty+q(x0+1,y0+1)*tx*ty};
+    const mkI=(W,H,T)=>{const im={width:W,height:H,data:new Uint8ClampedArray(W*H*4),T};im.data.fill(30);for(let p=3;p<im.data.length;p+=4)im.data[p]=255;return im};
+    const syn=(W,H,T)=>{const im=mkI(W,H,T);SX.forEach((_,i)=>{const b=slotBox(W,H,i,T);for(let y=Math.max(0,b.y);y<Math.min(H,b.y+b.h);y++)for(let x=Math.max(0,b.x);x<Math.min(W,b.x+b.w);x++){const p=(y*W+x)*4;for(let c=0;c<3;c++)im.data[p+c]=sm(i+1,(x-b.x)/b.w,(y-b.y)/b.h,c)}});return im};
+    const ref=syn(2340,1080),tp2=SX.map((_,i)=>{const f=feat(ref,slotBox(2340,1080,i));return{n:"t"+i,base:"t"+i,k:(i%6)<4?"st":"sp",z:norm(f),g:norm(gradF(f)),f}});
+    const T1={k:.7,cx:1000,oy:90},im2=syn(2000,900,T1);delete im2.T;
+    const c=await calibrate(im2,tp2,{nocache:true});
+    ok("calibrate: 拡大・ずれた配置を補正する",!!c&&c.used&&Math.abs(c.T.k/T1.k-1)<.03&&Math.abs(c.T.cx-T1.cx)<24&&Math.abs(c.T.oy-T1.oy)<14);
+    const m2=await matchAll(im2,tp2);ok("calibrate後: 12枠を正しく読む",m2.every((x,i)=>x.n==="t"+i));
+    const c2=await calibrate(syn(2340,1080),tp2,{nocache:true});ok("calibrate: 既定どおりなら補正しない",!!c2&&!c2.used);
+    ok("calibrate: 辞書が空ならnull",(await calibrate(syn(2340,1080),[],{nocache:true}))===null);
+    {const T={k:.7,cx:1000,oy:90},g=mkI(2000,900,T);for(let y=Math.round(GY(T,260));y<Math.round(GY(T,320));y++)for(let x=Math.round(GX(T,320));x<Math.round(GX(T,470));x++){const p=(y*2000+x)*4;g.data[p]=240;g.data[p+1]=200;g.data[p+2]=60}ok("judge: 補正した座標で勝敗を読む",judge(g)==="WIN")}
+    {const W=1000,H=500,g=mkI(W,H);for(let y=0;y<H;y++)for(let x=0;x<W;x++){const p=(y*W+x)*4,v=(x>=40&&x<W-40&&y>=20)?120:0;g.data[p]=g.data[p+1]=g.data[p+2]=v}const t=barTrim(g);ok("barTrim: 黒帯を検出",t.x===40&&t.y===20&&t.w===920&&t.h===480)}
+  }catch(e){ok("画面補正テスト: 例外 "+e,false)}
 }
 async function selfTest(){await selfTestExtra();
   const r=[],ok=(n,c)=>r.push((c?"OK   ":"FAIL ")+n),A=["a","b","c","d","e","f"];
