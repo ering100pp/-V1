@@ -126,6 +126,12 @@ button,.chip,.rb{touch-action:manipulation}
 .dgc{background:var(--card);border-radius:14px;padding:16px;max-width:420px;width:100%;box-sizing:border-box}
 .dgc p{white-space:pre-line;margin:0 0 14px}
 .dga{display:flex;gap:8px}.dga .btn{flex:1}
+/* STR=薄い赤 / SP=薄い青: 枠の背景・縁・記号の色はライト/ダークで変えない */
+.tl.st .sq,.slot.st .sq,.ff button.st .sq{background:#f2c4c4;color:#6b4a4a}
+.tl.sp .sq,.slot.sp .sq,.ff button.sp .sq{background:#c4d8f4;color:#44566e}
+.slot.st .sq{border-color:#d98a8a}
+.slot.sp .sq{border-color:#7fa6e0}
+.slot.st.miss .sq,.slot.sp.miss .sq{background:#f6e3a8;border-color:#e0a000;color:#5a4a1a}
 </style></head><body>
 <div class="wrap">
 <div class="hd"><h1>戦術対抗戦ログ <span class="sbd" id="sbd"></span></h1><div style="display:flex;gap:6px"><button class="chip" id="rl">再読込</button><button class="chip" id="th">テーマ</button></div></div>
@@ -522,9 +528,12 @@ function iconTh(n){
   return t.t2;
 }
 const iconImg=n=>{const s=iconTh(n);return s?`<img src="${esc(s)}" alt="">`:""};
-const tile=(n,l)=>`<div class="tl"><span class="sq">${iconImg(n)}<span class="pos">${l}</span>${n?"":"－"}</span><span class="nm">${esc(n)||"　"}</span></div>`;
+/* 表示ラベル: 1〜4枠は攻撃編成ならA1〜4・防衛編成ならD1〜4、SPはSP1・SP2。kind="A"|"D" */
+const lab=(i,kind)=>i<4?kind+(i+1):NM[i];
+const brd=(side)=>(side==="d")===(F.o!=="D")?"D":"A";
+const tile=(n,l,c)=>`<div class="tl ${c}"><span class="sq">${iconImg(n)}<span class="pos">${l}</span>${n?"":"－"}</span><span class="nm">${esc(n)||"　"}</span></div>`;
 const slot=(side,i)=>{const nm=F[side][i],sd=F.o==="D"?(side==="d"?"相手の攻撃":"自分の防衛"):(side==="d"?"防衛":"攻撃"),miss=(MISS.has(side+i)&&!nm)||(AMB.has(side+i)&&!!nm);
-  return `<div class="sl"><button class="slot${nm?"":" emp"}${miss?" miss":""}" data-s="${side}${i}" aria-label="${sd} ${NM[i]} ${esc(nm)||"空"}${miss?(nm?"(要確認)":"(未認識)"):""}"><span class="sq">${iconImg(nm)}<span class="pos">${NM[i]}</span>${miss?`<span class="flag">${nm?"要確認":"未認識"}</span>`:""}${nm?"":"＋"}</span><span class="nm">${esc(nm)||"　"}</span></button></div>`};
+  return `<div class="sl"><button class="slot ${i<4?"st":"sp"}${nm?"":" emp"}${miss?" miss":""}" data-s="${side}${i}" aria-label="${sd} ${lab(i,brd(side))} ${esc(nm)||"空"}${miss?(nm?"(要確認)":"(未認識)"):""}"><span class="sq">${iconImg(nm)}<span class="pos">${lab(i,brd(side))}</span>${miss?`<span class="flag">${nm?"要確認":"未認識"}</span>`:""}${nm?"":"＋"}</span><span class="nm">${esc(nm)||"　"}</span></button></div>`};
 const nameSel=(k,label)=>{const v=F[k]||"",l=allPlayers();if(v&&!l.includes(v))l.push(v);
   return `<label>${label}</label><select data-nk="${k}"><option value="">未選択</option>${l.map(x=>`<option${x===v?" selected":""}>${esc(x)}</option>`).join("")}<option value="__new">新しい名前を追加</option></select><input data-nn="${k}" placeholder="新しい名前を入力して確定" hidden>`};
 function drawNames(){$("#pn").innerHTML=nameSel("me","自分の名前")+nameSel("n","相手の名前")}
@@ -555,7 +564,7 @@ function boardClick(e){
 }
 const usage=(side,idx)=>{const c={};for(const r of S.records)for(const i of idx){const x=(side==="a"?r.a:r.d)[i];if(x)c[x]=(c[x]||0)+1}return c};
 function openSheet(side,i){
-  cur={side,i};SHOWALL=false;$("#sq").hidden=false;$("#shb").hidden=false;$("#sht").textContent=(side==="d"?(F.o==="D"?"相手の攻撃 ":"相手の防衛 "):side==="a"?(F.o==="D"?"自分の防衛 ":"自分の攻撃 "):"絞り込み(相手の防衛) ")+NM[i]+(chain?`(未認識 残り${MISS.size})`:"");
+  cur={side,i};SHOWALL=false;$("#sq").hidden=false;$("#shb").hidden=false;$("#sht").textContent=(side==="d"?(F.o==="D"?"相手の攻撃 ":"相手の防衛 "):side==="a"?(F.o==="D"?"自分の防衛 ":"自分の攻撃 "):"絞り込み(相手の防衛) ")+lab(i,side==="f"?"D":brd(side))+(chain?`(未認識 残り${MISS.size})`:"");
   $("#sq").value="";drawSheet();$("#sh").hidden=false;if(matchMedia("(hover:hover)").matches)setTimeout(()=>$("#sq").focus(),60);
 }
 let SHOWALL=false,HQ=[];
@@ -576,7 +585,7 @@ function drawSheet(){
 }
 function askH(side,i){
   const base=F[side][i];cur={side,i,mode:"h",base};
-  $("#sht").textContent=`${base}はどのモード?(${side==="d"?"相手の防衛 ":"自分の攻撃 "}${NM[i]})`;
+  $("#sht").textContent=`${base}はどのモード?(${side==="d"?"相手の防衛 ":"自分の攻撃 "}${lab(i,brd(side))})`;
   $("#sq").hidden=true;$("#shb").hidden=true;drawSheet();$("#sh").hidden=false;
 }
 function pick(x){
@@ -898,7 +907,7 @@ const CH=(k,v,l)=>`<button class="chip${H[k]===v?" on":""}" data-k="${k}" data-v
 function drawChips(){
   $("#hc").innerHTML=[CH("se","","全シーズン"),...seasons().map(x=>CH("se",x,x))].join("")+`<i class="br"></i>`+[CH("per","all","全期間"),CH("per","1","今日"),CH("per","7","7日"),CH("per","30","30日"),CH("me","","全員"),CH("me","1","自分のみ")].join("")+`<i class="br"></i>`+
    (H.mo==="D"?[CH("ds","rate","勝率順(少数補正)"),CH("ds","n","戦数順"),CH("ds","new","新しい順")]:[CH("so","new","新しい順"),CH("so","old","古い順")]).join("");
-  $("#hf").innerHTML=IDX.map(k=>`<div><button data-fs="${k}" class="${H.fd[k]?"set":""}" aria-label="絞り込み ${NM[k]} ${esc(H.fd[k])||"指定なし"}"><span class="sq">${iconImg(VBASE.has(H.fd[k])?VBASE.get(H.fd[k])[0]:H.fd[k])}<span class="pos">${NM[k]}</span>${H.fd[k]?"":"－"}</span><span class="nm">${esc(H.fd[k])||"　"}</span></button></div>`).join("");
+  $("#hf").innerHTML=IDX.map(k=>`<div><button data-fs="${k}" class="${k<4?"st":"sp"}${H.fd[k]?" set":""}" aria-label="絞り込み ${lab(k,"D")} ${esc(H.fd[k])||"指定なし"}"><span class="sq">${iconImg(VBASE.has(H.fd[k])?VBASE.get(H.fd[k])[0]:H.fd[k])}<span class="pos">${lab(k,"D")}</span>${H.fd[k]?"":"－"}</span><span class="nm">${esc(H.fd[k])||"　"}</span></button></div>`).join("");
 }
 /* 防衛編成の判定: STR1-4は枠の位置まで一致、SP1/SP2は順不同。空欄は条件なし */
 function defHit(d,fd){
@@ -919,15 +928,15 @@ function hit(r){
   if(q&&!nz(r.n||"").includes(q))return false;
   return H.mo==="D"?true:defHit(r.d,H.fd);
 }
-const row=arr=>`<div class="fm">${IDX.map(k=>tile(arr[k],NM[k])).join("")}</div>`;
+const row=(arr,kind)=>`<div class="fm">${IDX.map(k=>tile(arr[k],lab(k,kind),k<4?"st":"sp")).join("")}</div>`;
 const OPEN=new Set();
 function card(r){
   const win=r.r==="WIN",d=new Date(r.t),id=esc(r.id);
   const tm=isNaN(d)?"":d.toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit"});
   return `<div class="rc ${win?"win":r.r?"lose":""}"><div class="rh"><span class="bd ${win?"w":r.r?"l":""}">${esc(r.r||"－")}</span><b class="rn">${esc(r.n)||"(名前なし)"}</b><span class="rt">${tm}</span></div>
-  ${row(r.d)}
+  ${row(r.d,r.o==="D"?"A":"D")}
   <details class="at" data-id="${id}"${OPEN.has(String(r.id))?" open":""}><summary>攻撃を見る${r.m?"(メモあり)":""}</summary>
-  ${r.me?`<div class="lb">自分: ${esc(r.me)}</div>`:""}${row(r.a)}
+  ${r.me?`<div class="lb">自分: ${esc(r.me)}</div>`:""}${row(r.a,r.o==="D"?"D":"A")}
   ${r.m?`<p class="mut" style="margin:6px 0 0">${esc(r.m)}</p>`:""}
   <div class="act"><button class="del" data-f="${id}">この防衛で絞り込み</button><button class="del" data-e="${id}">編集</button><button class="del" data-x="${id}">削除</button></div></details></div>`;
 }
@@ -951,39 +960,33 @@ function defGroups(rows){
 function atkRow(r){
   const win=r.r==="WIN",d=new Date(r.t),id=esc(r.id);
   const dt=isNaN(d)?"":d.toLocaleString("ja-JP",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"});
-  return `<div class="ar"><div class="rh"><span class="bd ${win?"w":r.r?"l":""}">${esc(r.r||"－")}</span><b class="rn">${esc(r.n)||"(名前なし)"}</b><span class="rt">${dt}</span></div>${row(r.d)}${r.m?`<p class="mut" style="margin:4px 0 0">${esc(r.m)}</p>`:""}<div class="act"><button class="del" data-e="${id}">編集</button><button class="del" data-x="${id}">削除</button></div></div>`;
+  return `<div class="ar"><div class="rh"><span class="bd ${win?"w":r.r?"l":""}">${esc(r.r||"－")}</span><b class="rn">${esc(r.n)||"(名前なし)"}</b><span class="rt">${dt}</span></div>${row(r.d,"A")}${r.m?`<p class="mut" style="margin:4px 0 0">${esc(r.m)}</p>`:""}<div class="act"><button class="del" data-e="${id}">編集</button><button class="del" data-x="${id}">削除</button></div></div>`;
 }
 function defCard(g){
   const n=g.w+g.l,pc=n?Math.round(g.w/n*100):null,cls=n?(g.w/n>=0.5?"win":"lose"):"";
   return `<div class="rc ${cls}"><div class="rh"><span class="bd ${cls==="win"?"w":cls==="lose"?"l":""}">${pc==null?"－":pc+"%"}</span><b class="rn">${n?`${g.w}勝${g.l}敗`:"結果なし"}</b><span class="rt">${g.rs.length}件</span></div>
-  ${row(g.a)}
+  ${row(g.a,"D")}
   <details class="at" data-id="${esc(g.k)}"${OPEN.has(g.k)?" open":""}><summary>受けた攻撃を見る(${g.rs.length}件)</summary>${g.rs.map(atkRow).join("")}</details></div>`;
 }
 function statsD(recs){
-  const c={};
-  for(const r of recs)for(const s of new Set(r.d.filter(Boolean).map(grp))){const o=c[s]||(c[s]={n:0,k:0,w:0});o.n++;if(r.r){o.k++;if(r.r==="WIN")o.w++}}
-  const top=Object.entries(c).sort((a,b)=>b[1].n-a[1].n).slice(0,10);
+  const c={},N=recs.length;
+  for(const r of recs)for(const s of new Set(r.d.filter(Boolean).map(grp)))c[s]=(c[s]||0)+1;
+  const top=Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,10);
   if(!top.length)return `<p class="mut">集計できる記録がありません</p>`;
-  return `<div class="lb">相手の攻撃に多い生徒(守りの勝敗)</div><table class="stt">${top.map(([s,o])=>`<tr><td>${esc(s)}</td><td class="r">${o.n}回</td><td class="r">${o.w}勝${o.k-o.w}敗 ${pct(o.w,o.k)}</td></tr>`).join("")}</table>`;
+  return `<div class="lb">相手の攻撃の採用率(全${N}件中)</div><table class="stt">${top.map(([s,n])=>`<tr><td>${esc(s)}</td><td class="r">${n}回</td><td class="r">${pct(n,N)}</td></tr>`).join("")}</table>`;
 }
 const pct=(w,n)=>n?Math.round(w/n*100)+"%":"－";
 function stats(recs){
-  const dc={},ac={},oc={};
+  const dc={},oc={},N=recs.length;
   for(const r of recs){
-    for(const s of new Set(r.d.filter(Boolean).map(grp))){const o=dc[s]||(dc[s]={n:0,k:0,w:0});o.n++;if(r.r){o.k++;if(r.r==="WIN")o.w++}}
-    if(!r.r)continue;
-    if(r.n){const o=oc[r.n]||(oc[r.n]={n:0,w:0});o.n++;if(r.r==="WIN")o.w++}
-    const st=r.a.slice(0,4).filter(Boolean).map(grp),sp=r.a.slice(4).filter(Boolean).map(grp).sort();
-    if(!st.length&&!sp.length)continue;
-    const k=st.join("・")+" / "+sp.join("・"),o=ac[k]||(ac[k]={n:0,w:0});o.n++;if(r.r==="WIN")o.w++;
+    for(const s of new Set(r.d.filter(Boolean).map(grp)))dc[s]=(dc[s]||0)+1;
+    if(!r.r||!r.n)continue;
+    const o=oc[r.n]||(oc[r.n]={n:0,w:0});o.n++;if(r.r==="WIN")o.w++;
   }
-  const top=Object.entries(dc).sort((a,b)=>b[1].n-a[1].n).slice(0,10);
-  const act=H.fd.some(Boolean);
-  const atk=Object.entries(ac).sort(act?(a,b)=>(b[1].w+1)/(b[1].n+2)-(a[1].w+1)/(a[1].n+2)||b[1].n-a[1].n:(a,b)=>b[1].n-a[1].n||b[1].w-a[1].w).slice(0,10);
+  const top=Object.entries(dc).sort((a,b)=>b[1]-a[1]).slice(0,10);
   const opp=Object.entries(oc).sort((a,b)=>b[1].n-a[1].n).slice(0,10);
-  if(!top.length&&!atk.length)return `<p class="mut">集計できる記録がありません</p>`;
-  return `<div class="lb">相手の防衛に多い生徒</div><table class="stt">${top.map(([s,o])=>`<tr><td>${esc(s)}</td><td class="r">${o.n}回</td><td class="r">${o.w}勝${o.k-o.w}敗 ${pct(o.w,o.k)}</td></tr>`).join("")}</table>
-  <div class="lb">${act?"この防衛への攻撃編成(勝率順・少数は控えめ補正)":(H.me==="1"?"自分":"全員")+"の攻撃編成別の成績"}</div><table class="stt">${atk.map(([k,o])=>`<tr><td>${esc(k)}</td><td class="r">${o.w}勝${o.n-o.w}敗 ${pct(o.w,o.n)}</td></tr>`).join("")}</table>
+  if(!top.length&&!opp.length)return `<p class="mut">集計できる記録がありません</p>`;
+  return `<div class="lb">相手の防衛の採用率(全${N}件中)</div><table class="stt">${top.map(([s,n])=>`<tr><td>${esc(s)}</td><td class="r">${n}回</td><td class="r">${pct(n,N)}</td></tr>`).join("")}</table>
   <div class="lb">相手別の成績(対戦数順)</div><table class="stt">${opp.map(([k,o])=>`<tr><td>${esc(k)}</td><td class="r">${o.n}戦</td><td class="r">${o.w}勝${o.n-o.w}敗 ${pct(o.w,o.n)}</td></tr>`).join("")}</table>`;
 }
 function renderHist(){
@@ -994,7 +997,7 @@ function renderHist(){
   rows.sort((a,b)=>{const d=(+new Date(a.t)||0)-(+new Date(b.t)||0);return H.so==="old"?d:-d});HM={k:mk,rows};}
   const w=rows.filter(r=>r.r==="WIN").length,n=rows.filter(r=>r.r).length;
   $("#sm").innerHTML=`<b>${rows.length}件</b> / 全${S.records.length}件`+(n?`　<b>${w}勝${n-w}敗・勝率${Math.round(w/n*100)}%</b>`:"");
-  {const sk=mk+"|"+H.ds;if(HM.sk!==sk){HM.sh=H.mo==="D"?statsD(rows):stats(rows);HM.sk=sk}$("#ss").innerHTML=HM.sh}$("#ssd").open=H.mo!=="D"&&(SSU===null?H.fd.some(Boolean):SSU);
+  {const sk=mk+"|"+H.ds;if(HM.sk!==sk){HM.sh=H.mo==="D"?statsD(rows):stats(rows);HM.sk=sk}$("#ss").innerHTML=HM.sh}$("#ssd").open=H.mo==="D"?(SSU===true):(SSU===null?H.fd.some(Boolean):SSU);
   if(H.mo==="D"){$("#hl").innerHTML=rows.length?defGroups(rows).map(defCard).join(""):`<p class="mut" style="text-align:center">該当する防衛の記録がありません</p>`;return}
   $("#hl").innerHTML=rows.length?dayHtml(rows)+(rows.length>H.lim?`<button class="btn out" id="mr">もっと見る(残り${rows.length-H.lim}件)</button>`:""):`<p class="mut" style="text-align:center">該当する記録がありません</p>`;
   const mr=$("#mr");if(mr&&window.IntersectionObserver){const o=new IntersectionObserver(es=>{if(es[0].isIntersecting){o.disconnect();H.lim+=30;renderHist()}},{rootMargin:"200px"});o.observe(mr)}
