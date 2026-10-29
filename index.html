@@ -127,11 +127,15 @@ button,.chip,.rb{touch-action:manipulation}
 .dgc p{white-space:pre-line;margin:0 0 14px}
 .dga{display:flex;gap:8px}.dga .btn{flex:1}
 /* STR=薄い赤 / SP=薄い青: 枠の背景・縁・記号の色はライト/ダークで変えない */
-.tl.st .sq,.slot.st .sq,.ff button.st .sq{background:#f2c4c4;color:#6b4a4a}
-.tl.sp .sq,.slot.sp .sq,.ff button.sp .sq{background:#c4d8f4;color:#44566e}
+.tl.st .sq,.slot.st .sq,.ff button.st .sq{background:#f8e6e6;color:#6b4a4a}
+.tl.sp .sq,.slot.sp .sq,.ff button.sp .sq{background:#e4edfa;color:#44566e}
 .slot.st .sq{border-color:#d98a8a}
 .slot.sp .sq{border-color:#7fa6e0}
 .slot.st.miss .sq,.slot.sp.miss .sq{background:#f6e3a8;border-color:#e0a000;color:#5a4a1a}
+/* アイコン画像は枠いっぱいに表示されるので、画像の上にも薄い色を重ねる(画像が不透明なのでライト/ダークで変わらない) */
+.tl.st .sq::after,.slot.st .sq::after,.ff button.st .sq::after,.tl.sp .sq::after,.slot.sp .sq::after,.ff button.sp .sq::after{content:"";position:absolute;inset:0;pointer-events:none}
+.tl.st .sq::after,.slot.st .sq::after,.ff button.st .sq::after{background:rgba(235,70,70,.10)}
+.tl.sp .sq::after,.slot.sp .sq::after,.ff button.sp .sq::after{background:rgba(60,120,240,.10)}
 </style></head><body>
 <div class="wrap">
 <div class="hd"><h1>戦術対抗戦ログ <span class="sbd" id="sbd"></span></h1><div style="display:flex;gap:6px"><button class="chip" id="rl">再読込</button><button class="chip" id="th">テーマ</button></div></div>
